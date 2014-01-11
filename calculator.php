@@ -2,7 +2,7 @@
 <html>
 <body>
 
-<h1> Calculator Yay</h1>
+<h1> Calculator Yay!!</h1>
 
 <?php
 	echo "Hello world again!";
