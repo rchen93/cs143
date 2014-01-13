@@ -3,8 +3,10 @@
 <body>
 
 <h1> Calculator </h1>
+By Roger and Kailin
 
-<br>
+<br />
+<br />
 
 <form method="GET">
 	<input type="text" name="expr">
@@ -17,6 +19,7 @@ $expr = $_GET["expr"]; //expression to be matched
 
 $pattern = '/\s*[+ -]?[0-9]+\.?[0-9]*\s*(((\+\s*\-)|(\-\s*\+)|(\*\s*\-)|(\*\s*\+)|(\/\s*\+)|(\/\s*\-)|(\-\s+\-)|(\+\s+\+)|([\/\+\*\-]\s*))[0-9]+\.?[0-9]*)*/'; // pattern to match against 
 $zero = FALSE;
+preg_match($pattern, $expr, $matches);
 
 //preg_match($pattern, $expr, $matches);
 //var_dump($matches);
@@ -31,7 +34,7 @@ function e($errno, $errstr, $errfile, $errline) {
 
 set_error_handler('e');
 
-if (!empty($expr) && preg_match($pattern, $expr, $matches))
+if (!empty($expr) && $matches[0] === $expr)
 {
 
 	eval("\$ans = $expr;"); 
@@ -42,7 +45,8 @@ if (!empty($expr) && preg_match($pattern, $expr, $matches))
 	} 
 	else 
 	{
-		echo "Answer: ". $ans;
+		echo "<h3> Result </h3>";
+		echo $expr . " = " . $ans;
 	}
 
 }
