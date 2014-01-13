@@ -12,12 +12,14 @@
 </form>
 
 <?php
-// DECIMAL POINTS
 $expr = $_GET["expr"]; //expression to be matched
-$pattern = '/^([+ -]?[0-9]+\.?[0-9]*)(((\+\-)|(\-\+)|(\*\-)|(\*\+)|(\/\+)|(\/\-)|[\/\+\*\-])[0-9]+\.?[0-9]*)*$/'; // pattern to match against
-preg_match($pattern, $expr, $matches); 
+//$expr = preg_replace('/\s/', '', $expr);
 
+$pattern = '/\s*[+ -]?[0-9]+\.?[0-9]*\s*(((\+\s*\-)|(\-\s*\+)|(\*\s*\-)|(\*\s*\+)|(\/\s*\+)|(\/\s*\-)|(\-\s+\-)|(\+\s+\+)|([\/\+\*\-]\s*))[0-9]+\.?[0-9]*)*/'; // pattern to match against 
 $zero = FALSE;
+
+//preg_match($pattern, $expr, $matches);
+//var_dump($matches);
 
 function e($errno, $errstr, $errfile, $errline) {
     if ($errstr == "Division by zero") {

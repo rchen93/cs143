@@ -1,7 +1,3 @@
-Name: Roger Chen
-UID: 504043927
-Email: rchen93@ucla.edu
-
 Name: Kailin Chang
 UID: 503999157
 Email: klcathy@ucla.edu
