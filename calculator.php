@@ -17,7 +17,7 @@ By Roger and Kailin
 $expr = $_GET["expr"]; //expression to be matched
 //$expr = preg_replace('/\s/', '', $expr);
 
-$pattern = '/\s*[+ -]?[0-9]+\.?[0-9]*\s*(((\+\s*\-)|(\-\s*\+)|(\*\s*\-)|(\*\s*\+)|(\/\s*\+)|(\/\s*\-)|(\-\s+\-)|(\+\s+\+)|([\/\+\*\-]\s*))[0-9]+\.?[0-9]*)*/'; // pattern to match against 
+$pattern = '/\s*[+ -]?[0-9]+\.?[0-9]*\s*(((\+\s*\-)|(\-\s*\+)|(\*\s*\-)|(\*\s*\+)|(\/\s*\+)|(\/\s*\-)|(\-\s+\-)|(\+\s+\+)|(\s*[\/\*\+\-]\s*))[0-9]+\.?[0-9]*)*/'; // pattern to match against 
 $zero = FALSE;
 preg_match($pattern, $expr, $matches);
 
