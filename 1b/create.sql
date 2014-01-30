@@ -1,30 +1,27 @@
 CREATE TABLE Movie (id int, 
-					title varchar(100), 
+					title varchar(100) NOT NULL, -- The movie must have a title
 					year int, 
 					rating varchar(10), 
 					company varchar(50), 
-					PRIMARY KEY(id),		-- Movie id's must be unique
-					CHECK(title IS NOT NULL))	-- Movie must have a title
+					PRIMARY KEY(id))		-- Movie id's must be unique
 					ENGINE = INNODB; 
 
 CREATE TABLE Actor (id int, 
 					last varchar(20), 
 					first varchar(20), 
 					sex varchar(6), 
-					dob date, 
+					dob date NOT NULL, -- The actor must have a date of birth
 					dod date, 
 					PRIMARY KEY(id),	-- Actor id's must be unique 
-					CHECK(dob IS NOT NULL),	-- The actor must have a date of birth
 					CHECK(sex='Male' OR sex='Female'),		-- The gender of the actor must be male or female
 					CHECK(dod >= dob)) 	ENGINE = INNODB;		-- An actor cannot die before their birth
 
 CREATE TABLE Director (id int, 
 					last varchar(20), 
 					first varchar(20), 
-					dob date, 
+					dob date NOT NULL, -- The director must have a date of birth
 					dod date, 
-					PRIMARY KEY(id),	-- Director id's must be unique and must have a date of birth
-					CHECK(dob IS NOT NULL),		-- The director must have a date of birth
+					PRIMARY KEY(id),	-- Director id's must be unique and must have a date of birth	
 					CHECK(dod >= dob)) ENGINE = INNODB;		-- A director cannot die before their birth
 
 CREATE TABLE MovieGenre (mid int, genre varchar(20),
