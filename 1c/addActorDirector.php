@@ -3,7 +3,7 @@
 <body>
 
 Add new actor/director: <br/>
-<form action="input.php" method="GET">
+<form action="addActorDirector.php" method="GET">
 	Identity:	<input type="radio" name="identity" value="Actor" checked="true">Actor
 				<input type="radio" name="identity" value="Director">Director<br/>
 	<hr/>
@@ -12,8 +12,8 @@ Add new actor/director: <br/>
 	Sex:		<input type="radio" name="sex" value="Male" checked="true">Male
 				<input type="radio" name="sex" value="Female">Female<br/>
 				
-	Date of Birth:	<input type="text" name="dob"><br/>
-	Date of Death:	<input type="text" name="dod"> (leave blank if alive now)<br/>
+	Date of Birth:	<input type="text" name="dob"> (Please enter in the form of yyyymmdd)<br/>
+	Date of Death:	<input type="text" name="dod"> (Leave blank if still alive)<br/>
 	<input type="submit" name="submit" value="Submit"/>
 </form>
 <hr/>
@@ -26,6 +26,7 @@ $fields = array("identity", "first", "last", "sex", "dob");
 $error = false;
 $dod = false;
 
+/* Checking that required form fields have been entered */
 foreach ($fields as $key)
 {
 	if (isset($_GET[$key]))
@@ -37,6 +38,7 @@ foreach ($fields as $key)
 		$error = true;
 }
 
+/* MySQL insertion */
 if (isset($_GET["submit"]))
 {
 	if ($error)
@@ -45,20 +47,35 @@ if (isset($_GET["submit"]))
 	{
 		echo "All fields have been set!</br>";
 
-		$query = "INSERT INTO $_GET[identity] (id, last, first, sex, dob, dod)
-		VALUES ('68999', '$_GET[last]', '$_GET[first]', '$_GET[sex]', '$_GET[dob]', '$_GET[dod]')";
-		$result = mysql_query($query, $db_connection);
+		$lookup_query = "SELECT id FROM MaxPersonID";
+		$lookup_result = mysql_fetch_row(mysql_query($lookup_query, $db_connection));
+		$id = $lookup_result[0];
+
+		$insert_query = "INSERT INTO $_GET[identity] (id, last, first, sex, dob, dod)
+		VALUES ($id, '$_GET[last]', '$_GET[first]', '$_GET[sex]', '$_GET[dob]', '$_GET[dod]')";
+		$result = mysql_query($insert_query, $db_connection);
+
 		if (!$result) 
 		{
     		$message  = 'Invalid query: ' . mysql_error() . "\n";
-    		$message .= 'Whole query: ' . $query;
-    		die($message);ceez
+    		$message .= 'Whole query: ' . $insert_query;
+    		die($message);
 		}
 		else
-			echo "$_GET[identity] added successfully!";
+		{
+			echo "$_GET[identity] added successfully!<br/>";
+			$update_query = "UPDATE MaxPersonID SET id=id+1";
+			if (mysql_query($update_query, $db_connection))
+			{
+				echo "MaxPersonID updated!";			/* Remove later */
+			}
+			else
+				echo "Failed";						 	/* Remove later */
+		}
 	}
 
 }
+
 mysql_close($db_connection);
 
 
