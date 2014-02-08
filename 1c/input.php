@@ -3,7 +3,7 @@
 <body>
 
 Add new actor/director: <br/>
-<form action="input.php" method="POST">
+<form action="input.php" method="GET">
 	Identity:	<input type="radio" name="identity" value="Actor" checked="true">Actor
 				<input type="radio" name="identity" value="Director">Director<br/>
 	<hr/>
@@ -14,7 +14,7 @@ Add new actor/director: <br/>
 				
 	Date of Birth:	<input type="text" name="dob"><br/>
 	Date of Death:	<input type="text" name="dod"> (leave blank if alive now)<br/>
-	<input type="submit" name="press" value="Submit"/>
+	<input type="submit" name="submit" value="Submit"/>
 </form>
 <hr/>
 
@@ -26,20 +26,43 @@ $fields = array("identity", "first", "last", "sex", "dob");
 $error = false;
 $dod = false;
 
-	foreach ($fields as $key)
+foreach ($fields as $key)
+{
+	if (isset($_GET[$key]))
 	{
-		if (isset($_POST[$key]))
+		if (empty($_GET[$key]))
 			$error = true;
 	}
+	else
+		$error = true;
+}
 
+if (isset($_GET["submit"]))
+{
 	if ($error)
 		echo "At least one field is missing!";
 	else
-		echo "All fields have been set!";
+	{
+		echo "All fields have been set!</br>";
 
+		$query = "INSERT INTO $_GET[identity] (id, last, first, sex, dob, dod)
+		VALUES ('68999', '$_GET[last]', '$_GET[first]', '$_GET[sex]', '$_GET[dob]', '$_GET[dod]')";
+		$result = mysql_query($query, $db_connection);
+		if (!$result) 
+		{
+    		$message  = 'Invalid query: ' . mysql_error() . "\n";
+    		$message .= 'Whole query: ' . $query;
+    		die($message);ceez
+		}
+		else
+			echo "$_GET[identity] added successfully!";
+	}
 
-
+}
 mysql_close($db_connection);
+
+
+
 ?>
 			
 
