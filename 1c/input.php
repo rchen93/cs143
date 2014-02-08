@@ -14,20 +14,31 @@ Add new actor/director: <br/>
 				
 	Date of Birth:	<input type="text" name="dob"><br/>
 	Date of Death:	<input type="text" name="dod"> (leave blank if alive now)<br/>
-	<input type="submit" value="Submit"/>
+	<input type="submit" name="press" value="Submit"/>
 </form>
 <hr/>
 
 <?php
-$query = $_POST["query"];
 $db_connection = mysql_connect("localhost", "cs143", "");
 mysql_select_db("CS143", $db_connection);
 
-if (!empty($query))
-{ 
+$fields = array("identity", "first", "last", "sex", "dob");
+$error = false;
+$dod = false;
+
+	foreach ($fields as $key)
+	{
+		if (isset($_POST[$key]))
+			$error = true;
+	}
+
+	if ($error)
+		echo "At least one field is missing!";
+	else
+		echo "All fields have been set!";
 
 
-}
+
 mysql_close($db_connection);
 ?>
 			
