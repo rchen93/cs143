@@ -24,7 +24,6 @@ mysql_select_db("CS143", $db_connection);
 
 $fields = array("identity", "first", "last", "sex", "dob");
 $error = false;
-$dod = false;
 
 /* Checking that required form fields have been entered */
 foreach ($fields as $key)
@@ -45,7 +44,7 @@ if (isset($_GET["submit"]))
 		echo "At least one field is missing!";
 	else
 	{
-		echo "All fields have been set!</br>";
+		echo "All fields have been set!</br>";			/* Remove later */
 
 		$lookup_query = "SELECT id FROM MaxPersonID";
 		$lookup_result = mysql_fetch_row(mysql_query($lookup_query, $db_connection));
