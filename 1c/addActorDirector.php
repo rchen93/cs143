@@ -3,7 +3,7 @@
 <body>
 
 Add new actor/director: <br/>
-<form action="addActorDirector.php" method="GET">
+<form action="addActorDirector.php" method="POST">
 	Identity:	<input type="radio" name="identity" value="Actor" checked="true">Actor
 				<input type="radio" name="identity" value="Director">Director<br/>
 	<hr/>
@@ -29,9 +29,9 @@ $error_message = "At least one field is missing!";
 /* Check required fields */
 foreach ($fields as $key)
 {
-	if (isset($_GET[$key]))
+	if (isset($_POST[$key]))
 	{
-		if (empty($_GET[$key]))
+		if (empty($_POST[$key]))
 			$error = true;
 	}
 	else
@@ -41,16 +41,16 @@ foreach ($fields as $key)
 /* Check if dates are valid */
 if (!$error)
 {
-	if (strlen($_GET['dob']) != 8 || !ctype_digit($_GET['dob']))
+	if (strlen($_POST['dob']) != 8 || !ctype_digit($_POST['dob']))
 	{
 		$error = true;
 		$error_message = "Invalid Date of Birth!";
 	}
-	else if (isset($_GET['dod']))
+	else if (isset($_POST['dod']))
 	{
-		if (!empty($_GET['dod']))
+		if (!empty($_POST['dod']))
 		{
-			if (strlen($_GET['dod']) != 8 || !ctype_digit($_GET['dod']))
+			if (strlen($_POST['dod']) != 8 || !ctype_digit($_POST['dod']))
 			{
 				$error = true;
 				$error_message = "Invalid Date of Death!";
@@ -61,7 +61,7 @@ if (!$error)
 }
 
 /* MySQL insertion */
-if (isset($_GET["submit"]))
+if (isset($_POST["submit"]))
 {
 	if ($error)
 		echo $error_message;
@@ -73,9 +73,18 @@ if (isset($_GET["submit"]))
 		$lookup_result = mysql_fetch_row(mysql_query($lookup_query, $db_connection));
 		$id = $lookup_result[0];
 
-		$insert_query = "INSERT INTO $_GET[identity] (id, last, first, sex, dob, dod)
-		VALUES ($id, '$_GET[last]', '$_GET[first]', '$_GET[sex]', '$_GET[dob]', '$_GET[dod]')";
-		$result = mysql_query($insert_query, $db_connection);
+		if ($_POST['identity'] == "Actor")
+		{
+			$insert_query = "INSERT INTO $_POST[identity] (id, last, first, sex, dob, dod)
+			VALUES ($id, '$_POST[last]', '$_POST[first]', '$_POST[sex]', '$_POST[dob]', '$_POST[dod]')";
+			$result = mysql_query($insert_query, $db_connection);
+		}
+		else
+		{
+			$insert_query = "INSERT INTO $_POST[identity] (id, last, first, dob, dod)
+			VALUES ($id, '$_POST[last]', '$_POST[first]', '$_POST[dob]', '$_POST[dod]')";
+			$result = mysql_query($insert_query, $db_connection);
+		}
 
 		if (!$result) 
 		{
@@ -85,7 +94,7 @@ if (isset($_GET["submit"]))
 		}
 		else
 		{
-			echo "$_GET[identity] added successfully!<br/>";
+			echo "$_POST[identity] added successfully!<br/>";		
 			$update_query = "UPDATE MaxPersonID SET id=id+1";
 			if (mysql_query($update_query, $db_connection))
 			{
