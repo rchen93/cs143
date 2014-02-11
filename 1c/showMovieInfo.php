@@ -89,7 +89,7 @@ else
 		$name = $row[0];				
 		$role = $row[1];
 		$aid = $row[2];
-		echo "<a href='http://192.168.56.20/~cs143/showActorInfo.php?aid=$aid'> $name </a>"  
+		echo "<a href='http://192.168.56.20/~cs143/showActorInfo.php?aid=$aid'> $name</a>"  
 			. " as $role <br/>";				
 	}
 }

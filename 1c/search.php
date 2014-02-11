@@ -29,16 +29,19 @@ if (isset($_GET["submit"]))
 		$length = count($words);
 
 		/* Actor Query */
-		/* Need to hyperlink Actor's names */
 		echo "<b> Searching records in Actor database... </b> <br/>";
 		if ($length == 1)
 		{
 			$actor_query = "SELECT id, first, last FROM Actor WHERE first LIKE 
 							'%$words[0]%' OR last LIKE '%$words[0]%'";
 			$actor_result = mysql_query($actor_query, $db_connection);
+
+
 			while ($actor_row = mysql_fetch_row($actor_result))
 			{
-				echo $actor_row[1] . " " . $actor_row[2] . "<br/>";
+				$aid = $actor_row[0];
+				$name = "$actor_row[1] $actor_row[2]";
+				echo "<a href='http://192.168.56.20/~cs143/showActorInfo.php?aid=$aid'> $name </a> <br/>";	
 			}
 		}
 		else if ($length == 2)
@@ -49,7 +52,9 @@ if (isset($_GET["submit"]))
 			$actor_result = mysql_query($actor_query, $db_connection);
 			while ($actor_row = mysql_fetch_row($actor_result))
 			{
-				echo $actor_row[1] . " " . $actor_row[2] . "<br/>";					
+				$aid = $actor_row[0];
+				$name = "$actor_row[1] $actor_row[2]";
+				echo "<a href='http://192.168.56.20/~cs143/showActorInfo.php?aid=$aid'> $name </a> <br/>";					
 			}
 		}
 		else
@@ -58,12 +63,6 @@ if (isset($_GET["submit"]))
 		/* Movie Query */
 		/* Need to hyperlink Movie titles */
 		echo "<b> Searching records in Movie database... </b> <br/>";
-
-		//$pat_words = "%$words[0]%";
-		//for ($i = 1; $i < $length; $i++)
-			//$pat_words .= $words[$i] . "%";
-		//echo $pat_words . "<br/>";
-		//$movie_query = "SELECT title FROM Movie WHERE title LIKE '$pat_words'";
 
 		// [[:<:]] - word boundary marker, so it matches on words in different order
 		$where_clause = "";
@@ -76,12 +75,16 @@ if (isset($_GET["submit"]))
 		}
 
 		//echo $where_clause;
-		$movie_query = "SELECT title FROM Movie WHERE $where_clause";
+		$movie_query = "SELECT id, title FROM Movie WHERE $where_clause";
 		$movie_result = mysql_query($movie_query, $db_connection);
 
 		while ($row = mysql_fetch_row($movie_result))
 		{
-			echo $row[0] . "<br/>";
+			$mid = $row[0];
+			$title = $row[1];
+			
+			echo "<a href='http://192.168.56.20/~cs143/showMovieInfo.php?mid=$mid'>" .
+			 "$title </a> <br/>";
 		}
 
 	}
