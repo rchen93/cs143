@@ -3,7 +3,7 @@
 <body>
 <h2>Add A Review</h2>
 <p>
-<form action="addReview.php" method="GET">
+<form action="addReview.php" method="POST">
 Name: <input type="text" name="name" maxlength="20"><br/>
 I give this movie 
 <select name="rating">
@@ -27,19 +27,19 @@ mysql_select_db("CS143", $db_connection);
 $default_name = 'Anonymous';
 
 /* MySQL insertion */
-if (isset($_GET["submit"]))				
+if (isset($_POST["submit"]))				
 {
 
-	if (empty($_GET['name']))
+	if (empty($_POST['name']))
 		$name = $default_name;
 	else
-		$name = $_GET['name'];
+		$name = $_POST['name'];
 
 	$time_query = "SELECT NOW()";
 	$time_result = mysql_fetch_row(mysql_query($time_query, $db_connection));
 
-	$review = $_GET['comment'];
-	$rating = $_GET['rating']; 
+	$review = $_POST['comment'];
+	$rating = $_POST['rating']; 
 	$time = $time_result[0];
 
 	$insert_query = "INSERT INTO Review (name, time, mid, rating, comment)

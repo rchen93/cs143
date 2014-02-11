@@ -3,7 +3,7 @@
 <body>
 
 Add new actor in movie: <br/>
-	<form action="addMovieDirector.php" method="GET">
+	<form action="addMovieDirector.php" method="POST">
 		Movie: <select name="mid">
 				<?php
 					$db_connection = mysql_connect("localhost", "cs143", "");
@@ -51,10 +51,13 @@ Add new actor in movie: <br/>
 $db_connection = mysql_connect("localhost", "cs143", "");
 mysql_select_db("CS143", $db_connection);
 
-if (isset($_GET["submit"]))
+if (isset($_POST["submit"]))
 {
+	echo "mid: $_POST[mid] <br/>";
+	echo "did: $_POST[did] <br/>";
+	
 	$insert_query = "INSERT INTO MovieDirector (mid, did) 
-	VALUES ('$_GET[mid]', '$_GET[did]')";
+	VALUES ('$_POST[mid]', '$_POST[did]')";
 	$insert_result = mysql_query($insert_query, $db_connection);
 
 	if (!$insert_result) 

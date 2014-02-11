@@ -3,7 +3,7 @@
 <body>
 
 Add new movie: <br/>
-		<form action="addMovieInfo.php" method="GET">			
+		<form action="addMovieInfo.php" method="POST">			
 			Title : <input type="text" name="title" maxlength="20"><br/>
 			Company: <input type="text" name="company" maxlength="50"><br/>
 			Year : <input type="text" name="year" maxlength="4"><br/>	<!-- Todo: validation-->	
@@ -49,9 +49,9 @@ mysql_select_db("CS143", $db_connection);
 $error = false;
 
 /* Check required fields */
-if (isset($_GET['title']))
+if (isset($_POST['title']))
 {
-	if (empty($_GET['title']))
+	if (empty($_POST['title']))
 		$error = true;
 }
 else
@@ -67,16 +67,16 @@ $allGenres = array("genre_Action", "genre_Adult", "genre_Adventure",
 
 foreach ($allGenres as $key)
 {
-	if(isset($_GET[$key]))
+	if(isset($_POST[$key]))
 	{
-		if(!empty($_GET[$key]))
-			$genres[] = $_GET[$key];
+		if(!empty($_POST[$key]))
+			$genres[] = $_POST[$key];
 	}
 }
 
 /* MySQL insertion */
 
-if (isset($_GET["submit"]))
+if (isset($_POST["submit"]))
 {
 	if ($error)
 		echo "Title is missing!";
@@ -87,7 +87,7 @@ if (isset($_GET["submit"]))
 		$id = $lookup_result[0];
 
 		$insertmovie_query = "INSERT INTO Movie (id, title, year, rating, company)
-		VALUES ($id, '$_GET[title]', '$_GET[year]', '$_GET[mpaarating]', '$_GET[company]')";
+		VALUES ($id, '$_POST[title]', '$_POST[year]', '$_POST[mpaarating]', '$_POST[company]')";
 		$newmovie = mysql_query($insertmovie_query, $db_connection);
 
 		for ($i = 0; $i < count($genres); $i++)
@@ -110,7 +110,7 @@ if (isset($_GET["submit"]))
 		}
 		else
 		{
-			echo "$_GET[title] added successfully!<br/>";
+			echo "$_POST[title] added successfully!<br/>";
 			$update_query = "UPDATE MaxMovieID SET id=id+1";
 			if (mysql_query($update_query, $db_connection))
 			{

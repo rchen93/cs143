@@ -5,7 +5,7 @@
 
 <h2> Search for Actors/Movies </h2>
 
-<form action="search.php" method="GET">		
+<form action="search.php" method="POST">		
 		Search: <input type="text" name="keyword"></input>
 		<input type="submit" name = "submit" value="Search"/>
 </form>
@@ -14,9 +14,9 @@
 $db_connection = mysql_connect("localhost", "cs143", "");
 mysql_select_db("CS143", $db_connection);
 
-if (isset($_GET["submit"]))				
+if (isset($_POST["submit"]))				
 {
-	$keyword = $_GET['keyword'];
+	$keyword = $_POST['keyword'];
 	if (empty($keyword))
 	{
 		echo "Please enter a search term. <br/>";
@@ -82,7 +82,7 @@ if (isset($_GET["submit"]))
 		{
 			$mid = $row[0];
 			$title = $row[1];
-			
+
 			echo "<a href='http://192.168.56.20/~cs143/showMovieInfo.php?mid=$mid'>" .
 			 "$title </a> <br/>";
 		}
