@@ -43,7 +43,7 @@ if (isset($_GET["submit"]))
 	$time = $time_result[0];
 
 	$insert_query = "INSERT INTO Review (name, time, mid, rating, comment)
-	VALUES ('$name', '$time', 6, '$rating', '$review')";
+	VALUES ('$name', '$time', 6, '$rating', '$review')";						// Hardcoded a movie id, change later
 
 	$result = mysql_query($insert_query, $db_connection);
 
