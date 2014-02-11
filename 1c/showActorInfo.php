@@ -78,6 +78,8 @@ else
 }
 
 mysql_close($db_connection);
+
+include 'search.php';
 ?>
 
 </html>

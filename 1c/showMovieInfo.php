@@ -127,6 +127,8 @@ while ($com_row = mysql_fetch_row($comment_result))
 
 
 mysql_close($db_connection);
+
+include 'search.php';
 ?>
 
 </html>
