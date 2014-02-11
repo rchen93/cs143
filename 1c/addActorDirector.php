@@ -24,6 +24,7 @@ mysql_select_db("CS143", $db_connection);
 
 $fields = array("identity", "first", "last", "sex", "dob");
 $error = false;
+$error_message = "At least one field is missing!";
 
 /* Check required fields */
 foreach ($fields as $key)
@@ -37,11 +38,33 @@ foreach ($fields as $key)
 		$error = true;
 }
 
+/* Check if dates are valid */
+if (!$error)
+{
+	if (strlen($_GET['dob']) != 8 || !ctype_digit($_GET['dob']))
+	{
+		$error = true;
+		$error_message = "Invalid Date of Birth!";
+	}
+	else if (isset($_GET['dod']))
+	{
+		if (!empty($_GET['dod']))
+		{
+			if (strlen($_GET['dod']) != 8 || !ctype_digit($_GET['dod']))
+			{
+				$error = true;
+				$error_message = "Invalid Date of Death!";
+			}
+		}
+	}
+
+}
+
 /* MySQL insertion */
 if (isset($_GET["submit"]))
 {
 	if ($error)
-		echo "At least one field is missing!";
+		echo $error_message;
 	else
 	{
 		echo "All fields have been set!</br>";			/* Remove later */
