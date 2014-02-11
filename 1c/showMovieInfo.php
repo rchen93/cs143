@@ -93,12 +93,12 @@ $count_result = mysql_fetch_row(mysql_query($count_query, $db_connection));
 
 if ($avg_result[0] == NULL)
 {
-	echo "Average Score: Not Available due to 0 reviews. <br/>";
+	echo "Average Score: Not Available due to 0 reviews. ";
 }
 else
-	echo "Average Score: $avg_result[0]/5 (5.0 is best) based on $count_result[0] review(s). <br/>";
+	echo "Average Score: $avg_result[0]/5 (5.0 is best) based on $count_result[0] review(s). ";
 
-/* Add a Add Comment button */
+echo "<a href='http://192.168.56.20/~cs143/addReview.php'>Add your review! </a> <br/>";
 
 $comment_query = "SELECT * FROM Review WHERE mid=$id";
 $comment_result = mysql_query($comment_query, $db_connection);
