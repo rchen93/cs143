@@ -25,7 +25,7 @@ mysql_select_db("CS143", $db_connection);
 $fields = array("identity", "first", "last", "sex", "dob");
 $error = false;
 
-/* Checking that required form fields have been entered */
+/* Check required fields */
 foreach ($fields as $key)
 {
 	if (isset($_GET[$key]))

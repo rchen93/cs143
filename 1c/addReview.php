@@ -15,28 +15,49 @@ I give this movie
 </select>
 out of 5 points (with 5 being the highest). </br>
 <textarea name="comment" cols="63" rows="8"></textarea>
-<input type="submit" value="Add Review!" />
+<input type="submit" name="submit" value="Add Review!" />
 </form> 
 </p>
 
 
 <?php
-$name = $_GET["name"];
-$review = $_GET["comment"];
-$rating = $_GET["rating"]; 
-
-
 $db_connection = mysql_connect("localhost", "cs143", "");
 mysql_select_db("CS143", $db_connection);
 
+$default_name = 'Anonymous';
 
-$insert_query = "INSERT INTO $Review (name, time, mid, rating, comment)
-VALUES ('$_GET[name]', 11:00, 12398, '$_GET[rating]', '$_GET[comment]')";
-$result = mysql_query($insert_query, $db_connection);
+/* MySQL insertion */
+if (isset($_GET["submit"]))				
+{
 
+	if (empty($_GET['name']))
+		$name = $default_name;
+	else
+		$name = $_GET['name'];
 
+	$time_query = "SELECT NOW()";
+	$time_result = mysql_fetch_row(mysql_query($time_query, $db_connection));
 
+	$review = $_GET['comment'];
+	$rating = $_GET['rating']; 
+	$time = $time_result[0];
 
+	$insert_query = "INSERT INTO Review (name, time, mid, rating, comment)
+	VALUES ('$name', '$time', 6, '$rating', '$review')";
+
+	$result = mysql_query($insert_query, $db_connection);
+
+	if (!$result) 
+	{
+	    $message  = 'Invalid query: ' . mysql_error() . "\n";
+	    $message .= 'Whole query: ' . $insert_query;
+	    die($message);
+	}
+	else
+		echo "Review added succesfully! <br/>";				/* Remove later */
+
+}
+mysql_close($db_connection);
 ?>
 </html>
 </body>

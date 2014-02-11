@@ -48,7 +48,7 @@ mysql_select_db("CS143", $db_connection);
 
 $error = false;
 
-/* Checking that required form fields have been entered */
+/* Check required fields */
 if (isset($_GET['title']))
 {
 	if (empty($_GET['title']))
@@ -57,7 +57,7 @@ if (isset($_GET['title']))
 else
 	$error = true;
 
-/* Checking what genres have been checked */
+/* Check selected genres */
 $genres = array();
 $allGenres = array("genre_Action", "genre_Adult", "genre_Adventure", 
 	"genre_Animation", "genre_Comedy", "genre_Crime", "genre_Documentary", 
