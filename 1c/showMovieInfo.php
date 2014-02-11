@@ -37,7 +37,8 @@ for ($i = 1; $i < $nfield; $i++)
 }
 
 /* Directors */
-$dir_query = "SELECT CONCAT(D.first, SPACE(1), D.last) name FROM MovieDirector MD, Director D WHERE MD.mid=$id AND D.id=MD.did";
+$dir_query = "SELECT CONCAT(D.first, SPACE(1), D.last) name 
+FROM MovieDirector MD, Director D WHERE MD.mid=$id AND D.id=MD.did";
 $dir_result = mysql_query($dir_query, $db_connection);
 
 if (mysql_num_rows($dir_result) == 0)
@@ -62,7 +63,8 @@ while ($genre_row = mysql_fetch_row($genre_result))
 
 echo "<h4> Cast </h4>";
 
-$cast_query = "SELECT CONCAT(A.first, SPACE(1), A.last) name, MA.role FROM MovieActor MA, Actor A WHERE MA.mid=$id AND A.id=MA.aid";
+$cast_query = "SELECT CONCAT(A.first, SPACE(1), A.last) name, MA.role 
+FROM MovieActor MA, Actor A WHERE MA.mid=$id AND A.id=MA.aid";
 $cast_result = mysql_query($cast_query, $db_connection);
 
 if (mysql_num_rows($cast_result) == 0)
