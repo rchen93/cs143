@@ -14,17 +14,17 @@ $lookup_result = mysql_fetch_row(mysql_query($lookup_query, $db_connection));
 $max = $lookup_result[0] - 1;
 
 /* Generate a random valid Movie ID */
-/*do {
+do {
 	$id = mt_rand(1, $max);
-	echo "ID: " . $id . "<br/>";
+	echo "ID: " . $id . "<br/>";							// Remove Later
 	$id_query = "SELECT * FROM Movie WHERE id=$id";
 	$result = mysql_query($id_query, $db_connection);
-} while (mysql_num_rows($result) == 0);*/
+} while (mysql_num_rows($result) == 0);
 
-// Hardcode Check
-$id = 6;
-$id_query = "SELECT * FROM Movie WHERE id=$id";
-$result = mysql_query($id_query, $db_connection);
+// Hardcode Check on a movie with reviews
+//$id = 6;
+//$id_query = "SELECT * FROM Movie WHERE id=$id";
+//$result = mysql_query($id_query, $db_connection);
 
 $nfield = mysql_num_fields($result);
 $rows = mysql_fetch_row($result);
@@ -63,7 +63,7 @@ while ($genre_row = mysql_fetch_row($genre_result))
 
 echo "<h4> Cast </h4>";
 
-$cast_query = "SELECT CONCAT(A.first, SPACE(1), A.last) name, MA.role 
+$cast_query = "SELECT CONCAT(A.first, SPACE(1), A.last) name, MA.role, A.id
 FROM MovieActor MA, Actor A WHERE MA.mid=$id AND A.id=MA.aid";
 $cast_result = mysql_query($cast_query, $db_connection);
 
@@ -75,10 +75,11 @@ else
 {
 	while ($row = mysql_fetch_row($cast_result))
 	{
-		$name = $row[0];				// Hyperlink $name
+		$name = $row[0];				
 		$role = $row[1];
-
-		echo $name . " as " . $role . "<br/>";				
+		$aid = $row[2];
+		echo "<a href='http://192.168.56.20/~cs143/showActorInfo.php?aid=$aid'> $name </a>"  
+			. " as $role <br/>";				
 	}
 }
 
