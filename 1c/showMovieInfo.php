@@ -13,13 +13,24 @@ $lookup_query = "SELECT id FROM MaxMovieID";
 $lookup_result = mysql_fetch_row(mysql_query($lookup_query, $db_connection));
 $max = $lookup_result[0] - 1;
 
-/* Generate a random valid Movie ID */
-do {
-	$id = mt_rand(1, $max);
-	echo "ID: " . $id . "<br/>";							// Remove Later
+/* If a valid Movie ID was passed in from URL */
+if (isset($_GET['mid']))
+{
+	$id = $_GET['mid'];
+	echo "ID: $id <br/>"; 			// Remove later
 	$id_query = "SELECT * FROM Movie WHERE id=$id";
 	$result = mysql_query($id_query, $db_connection);
-} while (mysql_num_rows($result) == 0);
+}
+else
+{
+	/* Generate a random valid Movie ID */
+	do {
+		$id = mt_rand(1, $max);
+		echo "ID: " . $id . "<br/>";							// Remove Later
+		$id_query = "SELECT * FROM Movie WHERE id=$id";
+		$result = mysql_query($id_query, $db_connection);
+	} while (mysql_num_rows($result) == 0);
+}
 
 // Hardcode Check on a movie with reviews
 //$id = 6;

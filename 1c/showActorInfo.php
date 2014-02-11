@@ -13,26 +13,39 @@ $lookup_query = "SELECT id FROM MaxPersonID";
 $lookup_result = mysql_fetch_row(mysql_query($lookup_query, $db_connection));
 $max = $lookup_result[0] - 1;
 
-/* Generate a random valid Actor ID */
-/* 
-do {
-	$id = mt_rand(1, $max);
-	echo "ID: " . $id . "<br/>";
+/* If a valid Actor ID was passed in from URL */
+if (isset($_GET['aid']))
+{
+	$id = $_GET['aid'];
+	echo "ID: $id <br/>"; 			// Remove later
 	$id_query = "SELECT * FROM Actor WHERE id=$id";
 	$result = mysql_query($id_query, $db_connection);
-} while (mysql_num_rows($result) == 0);
-*/
+}
+else
+{
+	/* Generate a random valid Actor ID */
+	do {
+		$id = mt_rand(1, $max);
+		echo "ID: $id <br/>";						// Remove later
+		$id_query = "SELECT * FROM Actor WHERE id=$id";
+		$result = mysql_query($id_query, $db_connection);
+	} while (mysql_num_rows($result) == 0);
+}
 
 // Hardcoded Actor because many actors do not have roles yet
-$id = 52794;
-$id_query = "SELECT * FROM Actor WHERE id=52794";
-$result = mysql_query($id_query, $db_connection);
+//$id = 52794;
+//$id_query = "SELECT * FROM Actor WHERE id=52794";
+//$result = mysql_query($id_query, $db_connection);
 
 $nfield = mysql_num_fields($result);
 $rows = mysql_fetch_row($result);
 
 echo "<h4> Profile </h4>";
-for ($i = 1; $i < $nfield; $i++)
+
+echo "$rows[2] <br/>";		// First name
+echo "$rows[1] <br/>";		// Last name
+
+for ($i = 3; $i < $nfield; $i++)
 {
 	echo $rows[$i] . "<br/>";	// Add headings to show what information represents
 }
@@ -44,20 +57,23 @@ $film_result = mysql_query($film_query, $db_connection);
 
 if (mysql_num_rows($film_result) == 0)
 {
-	echo "In Progress! :) <br/>"; 
+	echo "No Roles yet! :( <br/>"; 
 }
 else
 {
 	while ($row = mysql_fetch_row($film_result))
 	{
-		$role = $row[2];
 		$mid = $row[0];
+		$role = $row[2];
 
 		$title_query = "SELECT title FROM Movie WHERE id=$mid";
 		$title_result = mysql_fetch_row(mysql_query($title_query, $db_connection));
 		$title = $title_result[0];
 
-		echo $role . " in " . $title . "<br/>";				// Change $title to a hyperlink
+		echo "$role in ";
+		echo "<a href='http://192.168.56.20/~cs143/showMovieInfo.php?mid=$mid'>" .
+			 "$title </a> <br/>";
+
 	}
 }
 
