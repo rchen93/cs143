@@ -24,8 +24,8 @@ include 'search.php';
 <a href="addMovieInfo.php">Add Movie Info</a></br>
 <a href="addReview.php">Add A Review</a></br>
 <br/>
-<a href="showActorInfo">Show Actor Info</a></br>
-<a href="showMovieInfo">Show Movie Info</a></br>
+<a href="showActorInfo.php">Show Actor Info</a></br>
+<a href="showMovieInfo.php">Show Movie Info</a></br>
 </body> 
 
 
