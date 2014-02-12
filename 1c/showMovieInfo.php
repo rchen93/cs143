@@ -109,7 +109,7 @@ if ($avg_result[0] == NULL)
 else
 	echo "Average Score: $avg_result[0]/5 (5.0 is best) based on $count_result[0] review(s). ";
 
-echo "<a href='http://192.168.56.20/~cs143/addReview.php'>Add your review! </a> <br/>";
+echo "<a href='http://192.168.56.20/~cs143/addReview.php'>Add your review!</a> <br/><br/>";
 
 $comment_query = "SELECT * FROM Review WHERE mid=$id";
 $comment_result = mysql_query($comment_query, $db_connection);

@@ -1,0 +1,44 @@
+*{font-family:Courier New;}
+
+h1 {
+    font-size: 120px;
+    color: #434343;
+    text-align: right;
+    margin-bottom: 0em; 
+    margin-top: 20px; 
+    margin-right: 20px; 
+   
+}
+
+h2 {
+	font-family: Futura;  
+	font-weight: lighter;
+    font-size: 24px;
+    color: #434343;
+    text-align: right;
+    margin-top: 0em; 
+    margin-bottom: 2em; 
+    margin-right: 20px; 
+}
+
+
+a:link { 
+	color: #434343;
+	text-decoration: none; 
+	font-size: 1em; 
+}
+
+a:visited { 
+	color: #434343; 
+	text-decoration: none; 
+	font-size: 1em; 
+}
+
+a:hover { 
+	color: #434343; 
+	text-decoration: none; 
+	font-size: 1.5em; 
+}
+
+
+

@@ -2,18 +2,20 @@
 <html>
 <body>
 
+<link rel="stylesheet" href="add-style.css">
+
 Add new actor/director: <br/>
 <form action="addActorDirector.php" method="POST">
 	Identity:	<input type="radio" name="identity" value="Actor" checked="true">Actor
 				<input type="radio" name="identity" value="Director">Director<br/>
 	<hr/>
-	First Name:	<input type="text" name="first" maxlength="20"><br/>
-	Last Name:	<input type="text" name="last" maxlength="20"><br/>
+	First Name:	<input type="text" name="first" maxlength="20"><br/><br/>
+	Last Name:	<input type="text" name="last" maxlength="20"><br/><br/>
 	Sex:		<input type="radio" name="sex" value="Male" checked="true">Male
-				<input type="radio" name="sex" value="Female">Female<br/>
+				<input type="radio" name="sex" value="Female">Female<br/><br/>
 				
-	Date of Birth:	<input type="text" name="dob"> (Please enter in the form of yyyymmdd)<br/>
-	Date of Death:	<input type="text" name="dod"> (Leave blank if still alive)<br/>
+	Date of Birth:	<input type="text" name="dob"> (Please enter in the form of yyyymmdd)<br/><br/>
+	Date of Death:	<input type="text" name="dod"> (Leave blank if still alive)<br/><br/>
 	<input type="submit" name="submit" value="Submit"/>
 </form>
 <hr/>
@@ -54,6 +56,13 @@ if (!$error)
 			{
 				$error = true;
 				$error_message = "Invalid Date of Death!";
+			}
+
+			if ($_POST['dod'] < $_POST['dob'])
+			{
+				$error = true;
+				$error_message = "Date of Death cannot precede Date of Birth!";
+				
 			}
 		}
 	}

@@ -2,7 +2,9 @@
 <html>
 <body>
 
-Add new actor in movie: <br/>
+<link rel="stylesheet" href="add-style.css">
+
+Add new director in movie: <br/><br/>
 	<form action="addMovieDirector.php" method="POST">
 		Movie: <select name="mid">
 				<?php
@@ -23,12 +25,12 @@ Add new actor in movie: <br/>
 				?>
 				</select>
 
-				<br/>
+				<br/><br/>
 		Director: <select name="did">
 				<?php
 					$db_connection = mysql_connect("localhost", "cs143", "");
 					mysql_select_db("CS143", $db_connection);
-					$dir_query = "SELECT id, first, last FROM Director ORDER BY first";
+					$dir_query = "SELECT id, first, last FROM Director ORDER BY first, last";
 					$dir_result = mysql_query($dir_query, $db_connection);
 					while ($dir_row = mysql_fetch_row($dir_result))
 					{
@@ -42,7 +44,7 @@ Add new actor in movie: <br/>
 				?>
 				</select>
 
-				</br>
+				</br><br/>
 				<input type="submit" name="submit" value="Submit"/>
 	</form>
 	<hr/>

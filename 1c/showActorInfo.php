@@ -4,6 +4,7 @@
 
 <h2> Show Actor Info </h2>
 
+
 <?php
 $db_connection = mysql_connect("localhost", "cs143", "");
 mysql_select_db("CS143", $db_connection);
@@ -72,13 +73,13 @@ else
 
 		echo "$role in ";
 		echo "<a href='http://192.168.56.20/~cs143/showMovieInfo.php?mid=$mid'>" .
-			 "$title </a> <br/>";
+			 "$title</a> <br/>";
 
 	}
 }
 
 mysql_close($db_connection);
-
+echo "<br/>";
 include 'search.php';
 ?>
 

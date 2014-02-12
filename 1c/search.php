@@ -2,12 +2,12 @@
 <html>
 <body>
 
-
-<h2> Search for Actors/Movies </h2>
+Search for a movie or actor
+<link rel="stylesheet" href="search-style.css">
 
 <form action="search.php" method="POST">		
-		Search: <input type="text" name="keyword"></input>
-		<input type="submit" name = "submit" value="Search"/>
+		<input type="text" name="keyword"></input>
+		<input type="submit" name = "submit" value="search" style="position: absolute; left: -9999px; width: 1px; height: 1px;"/>
 </form>
 
 <?php
@@ -41,7 +41,7 @@ if (isset($_POST["submit"]))
 			{
 				$aid = $actor_row[0];
 				$name = "$actor_row[1] $actor_row[2]";
-				echo "<a href='http://192.168.56.20/~cs143/showActorInfo.php?aid=$aid'> $name </a> <br/>";	
+				echo "<a href='http://192.168.56.20/~cs143/showActorInfo.php?aid=$aid'>$name</a> <br/>";	
 			}
 		}
 		else if ($length == 2)
@@ -54,14 +54,13 @@ if (isset($_POST["submit"]))
 			{
 				$aid = $actor_row[0];
 				$name = "$actor_row[1] $actor_row[2]";
-				echo "<a href='http://192.168.56.20/~cs143/showActorInfo.php?aid=$aid'> $name </a> <br/>";					
+				echo "<a href='http://192.168.56.20/~cs143/showActorInfo.php?aid=$aid'>$name</a> <br/>";					
 			}
 		}
 		else
 			echo "No names found! <br/>"; 
 
 		/* Movie Query */
-		/* Need to hyperlink Movie titles */
 		echo "<b> Searching records in Movie database... </b> <br/>";
 
 		// [[:<:]] - word boundary marker, so it matches on words in different order
@@ -84,14 +83,10 @@ if (isset($_POST["submit"]))
 			$title = $row[1];
 
 			echo "<a href='http://192.168.56.20/~cs143/showMovieInfo.php?mid=$mid'>" .
-			 "$title </a> <br/>";
+			 "$title</a> <br/>";
 		}
 
 	}
-
-
-
-
 
 
 }

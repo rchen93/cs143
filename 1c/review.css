@@ -1,0 +1,13 @@
+*{font-family:Courier New;}
+
+body {
+	font-size: 20px;
+    color: #434343;
+    text-align: left;
+    .widget_search #searchsubmit {
+	display: none !important;}
+
+}
+
+
+

@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html>
 <body>
+
+<link rel="stylesheet" href="review.css">
+
 <h2>Add A Review</h2>
 <p>
 <form action="addReview.php" method="POST">
