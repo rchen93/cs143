@@ -11,10 +11,10 @@ Add new movie: <br/><br/>
 			Year : <input type="text" name="year" maxlength="4"><br/><br/>	<!-- Todo: validation-->	
 			MPAA Rating : <select name="mpaarating">
 					<option value="G">G</option>
-<option value="NC-17">NC-17</option>
-<option value="PG">PG</option>
-<option value="PG-13">PG-13</option>
-<option value="R">R</option>
+					<option value="PG">PG</option>
+					<option value="PG-13">PG-13</option>
+					<option value="R">R</option>
+					<option value="NC-17">NC-17</option>
 					</select>
 			<br/><br/>
 			Genre : 
@@ -134,6 +134,6 @@ mysql_close($db_connection);
 
 ?>
 			
-
+<a href='home.php'>Go Home</a></br>
 </html>
 </body>

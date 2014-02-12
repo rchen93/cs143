@@ -1,11 +1,8 @@
-General: -Handle insertion of existing relations
-		 -Add a go to home link
-		 -Submit button
-		 -Make forms sticky?
+General: ---Add a go to home link---
+		 ---Fix Submit button---
+		 -Sanitizing inputs?
+		 -showDirector.php?
 
-home.php: Maybe add buttons
-addActorDirector.php: Spacing
-addMovieActor|Director.php: Instead of dropdown menu, do chronological index?
-addMovieInfo.php: Reorder MPAA ratings
-showActorInfo|MovieInfo.php: -Change "No Roles yet! :(" to "Aspiring actor/actress :)"
-				   -Add headings: e.g. first, last, title
+addActorDirector.php: ---Spacing--
+showActorInfo|MovieInfo.php: --Changed phrase--
+				   ---Add headings: e.g. first, last, title---

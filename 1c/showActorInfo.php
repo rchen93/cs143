@@ -43,12 +43,18 @@ $rows = mysql_fetch_row($result);
 
 echo "<h4> Profile </h4>";
 
-echo "$rows[2] <br/>";		// First name
-echo "$rows[1] <br/>";		// Last name
+echo "Name: $rows[2] $rows[1]<br/>";		// First name
 
 for ($i = 3; $i < $nfield; $i++)
 {
-	echo $rows[$i] . "<br/>";	// Add headings to show what information represents
+	if ($i == 5)
+	{
+		echo ucfirst(mysql_field_name($result, $i)) . ": Still Alive <br/>";
+	}
+	else
+	{
+		echo ucfirst(mysql_field_name($result, $i)) . ": " . $rows[$i] . "<br/>";	
+	}
 }
 
 echo "<h4> Filmography </h4>";
@@ -58,7 +64,10 @@ $film_result = mysql_query($film_query, $db_connection);
 
 if (mysql_num_rows($film_result) == 0)
 {
-	echo "No Roles yet! :( <br/>"; 
+	if ($rows[3] == "Male")
+		echo "Aspiring Actor :) <br/>"; 
+	else
+		echo "Aspiring Actress :) <br/>";
 }
 else
 {
@@ -81,7 +90,10 @@ else
 mysql_close($db_connection);
 echo "<br/>";
 include 'search.php';
+
 ?>
+
+<a href='home.php'>Go Home</a></br>
 
 </html>
 </body>

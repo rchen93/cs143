@@ -43,8 +43,8 @@ $rows = mysql_fetch_row($result);
 echo "<h4> Profile </h4>";
 for ($i = 1; $i < $nfield; $i++)
 {
-	echo $rows[$i] . "<br/>";	// Add headings to show what information represents
-								// Maybe combine the year with Title, e.g. Title(yyyy)
+	echo ucfirst(mysql_field_name($result, $i)) . ": " 
+	. $rows[$i] . "<br/>";	
 }
 
 /* Directors */
@@ -54,24 +54,53 @@ $dir_result = mysql_query($dir_query, $db_connection);
 
 if (mysql_num_rows($dir_result) == 0)
 {
-	echo "No directors found! <br/>"; 	// Change to blank later?
+	echo "Director(s): <br/>";
 }
 else
 {
+	echo "Director(s): ";
+	$num_rows = mysql_num_rows($dir_result);
+	$counter = 1;
 	while($dir_row = mysql_fetch_row($dir_result))
 	{
-		echo $dir_row[0] . "<br/>";
+		if ($counter == $num_rows)
+		{
+			echo $dir_row[0] . "<br/>";
+		}
+		else
+		{
+			echo $dir_row[0] . ", ";
+			$counter++;
+		}
 	}
 }
 
 /* Genres */
 $genre_query = "SELECT genre FROM MovieGenre WHERE mid=$id";
 $genre_result = mysql_query($genre_query, $db_connection);
-while ($genre_row = mysql_fetch_row($genre_result))
-{
-	echo $genre_row[0] . "<br/>";
-}
 
+if (mysql_num_rows($genre_result) == 0)
+{
+	echo "Genre(s): <br/>";
+}
+else
+{
+	echo "Genre(s): ";
+	$num_rows = mysql_num_rows($genre_result);
+	$counter = 1;
+	while ($genre_row = mysql_fetch_row($genre_result))
+	{
+		if ($counter == $num_rows)
+		{
+			echo $genre_row[0] . "<br/>";
+		}
+		else
+		{
+			echo $genre_row[0] . ", ";
+			$counter++;
+		}
+	}
+}
 echo "<h4> Cast </h4>";
 
 $cast_query = "SELECT CONCAT(A.first, SPACE(1), A.last) name, MA.role, A.id
@@ -131,5 +160,6 @@ mysql_close($db_connection);
 include 'search.php';
 ?>
 
+<a href='home.php'>Go Home</a></br>
 </html>
 </body>

@@ -62,5 +62,7 @@ if (isset($_POST["submit"]))
 }
 mysql_close($db_connection);
 ?>
+
+<a href='home.php'>Go Home</a></br>
 </html>
 </body>
