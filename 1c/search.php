@@ -36,7 +36,7 @@ if (isset($_POST["submit"]))
 							'%$words[0]%' OR last LIKE '%$words[0]%'";
 			$actor_result = mysql_query($actor_query, $db_connection);
 
-			if (!actor_result)
+			if (!$actor_result)
 				echo "Something bad happened...Please try again! <br/>";
 			else
 			{
@@ -55,9 +55,8 @@ if (isset($_POST["submit"]))
 							(first LIKE '%$words[1]%' AND last LIKE '%$words[0]%')";
 			$actor_result = mysql_query($actor_query, $db_connection);
 
-			if (!actor_result)
+			if (!$actor_result)
 				echo "Something bad happened...Please try again! <br/>";
-
 			else
 			{
 				while ($actor_row = mysql_fetch_row($actor_result))
@@ -88,7 +87,7 @@ if (isset($_POST["submit"]))
 		$movie_query = "SELECT id, title, year FROM Movie WHERE $where_clause";
 		$movie_result = mysql_query($movie_query, $db_connection);
 
-		if (!movie_result)
+		if (!$movie_result)
 				echo "Something bad happened...Please try again! <br/>";
 		else
 		{
