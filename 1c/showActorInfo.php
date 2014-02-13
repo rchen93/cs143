@@ -2,6 +2,8 @@
 <html>
 <body>
 
+<link rel="stylesheet" href="show.css">
+
 <h2> Show Actor Info </h2>
 
 

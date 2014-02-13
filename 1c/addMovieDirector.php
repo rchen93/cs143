@@ -4,7 +4,7 @@
 
 <link rel="stylesheet" href="add-style.css">
 
-Add new director in movie: <br/><br/>
+<h2> Add New Director To A Movie </h2>
 	<form action="addMovieDirector.php" method="POST">
 		Movie: <select name="mid">
 				<?php
@@ -77,6 +77,6 @@ if (isset($_POST["submit"]))
 mysql_close($db_connection);
 ?>
 
-<a href='home.php'>Go Home</a></br>
+<h3><a href='home.php'>Go Home</a></h3>
 </html>
 </body>

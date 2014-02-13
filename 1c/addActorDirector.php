@@ -4,7 +4,7 @@
 
 <link rel="stylesheet" href="add-style.css">
 
-Add new actor/director: <br/>
+<h2>Add New Actor Or Director</h2>
 <form action="addActorDirector.php" method="POST">
 	Identity:	<input type="radio" name="identity" value="Actor" checked="true">Actor
 				<input type="radio" name="identity" value="Director">Director<br/>
@@ -122,8 +122,6 @@ mysql_close($db_connection);
 
 ?>
 			
-
-
-<a href='home.php'>Go Home</a></br>
+<h3><a href='home.php'>Go Home</a></h3>
 </html>
 </body>

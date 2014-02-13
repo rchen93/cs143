@@ -1,7 +1,7 @@
 *{font-family:Courier New;}
 
 body {
-	font-size: 20px;
+	font-size: 18px;
     color: #434343;
     text-align: left;
     .widget_search #searchsubmit {
@@ -10,9 +10,27 @@ body {
 }
 
 input, select, textarea {
-  font-size: 20px;
-  height:20px;
+  font-size: 18px;
+  height:18px;
   width:350px;
 
 }
 
+
+a:link { 
+	color: #434343;
+	text-decoration: none; 
+	font-size: 1em; 
+}
+
+a:visited { 
+	color: #434343; 
+	text-decoration: none; 
+	font-size: 1em; 
+}
+
+a:hover { 
+	color: #434343; 
+	text-decoration: none; 
+	font-size: 1.5em; 
+}

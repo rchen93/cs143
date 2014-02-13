@@ -4,7 +4,7 @@
 
 <link rel="stylesheet" href="add-style.css">
 
-Add new movie: <br/><br/>
+<h2>Add A New Movie</h2>
 		<form action="addMovieInfo.php" method="POST">			
 			Title : <input type="text" name="title" maxlength="20"><br/><br/>
 			Company: <input type="text" name="company" maxlength="50"><br/><br/>
@@ -134,6 +134,6 @@ mysql_close($db_connection);
 
 ?>
 			
-<a href='home.php'>Go Home</a></br>
+<h3><a href='home.php'>Go Home</a></h3></br>
 </html>
 </body>
