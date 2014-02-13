@@ -6,7 +6,25 @@
 
 <h2>Add A Review</h2>
 <p>
-<form action="addReview.php" method="POST">
+
+<form action="addReview.php" method="GET">
+Movie: <select name="mid">
+<?php
+	$db_connection = mysql_connect("localhost", "cs143", "");
+	mysql_select_db("CS143", $db_connection);
+
+	$id = $_GET['mid'];
+
+	$title_query = "SELECT title FROM Movie WHERE id=$id";
+	$title_result = mysql_fetch_row(mysql_query($title_query, $db_connection));
+	$title = $title_result[0];
+
+	echo "<option value='$id'>$title</option>";
+
+	mysql_close($db_connection);
+?>
+</select>
+<br/>
 Name: <input type="text" name="name" maxlength="20"><br/>
 I give this movie 
 <select name="rating">
@@ -23,41 +41,46 @@ out of 5 points (with 5 being the highest). </br>
 </p>
 
 
+
 <?php
 $db_connection = mysql_connect("localhost", "cs143", "");
 mysql_select_db("CS143", $db_connection);
 
 $default_name = 'Anonymous';
 
+
 /* MySQL insertion */
-if (isset($_POST["submit"]))				
+if (isset($_GET["submit"]))				
 {
 
-	if (empty($_POST['name']))
+	if (empty($_GET['name']))
 		$name = $default_name;
 	else
-		$name = $_POST['name'];
+		$name = $_GET['name'];
 
 	$time_query = "SELECT NOW()";
 	$time_result = mysql_fetch_row(mysql_query($time_query, $db_connection));
 
-	$review = $_POST['comment'];
-	$rating = $_POST['rating']; 
+	$review = $_GET['comment'];
+	$rating = $_GET['rating']; 
+	$mid = $_GET['mid'];
 	$time = $time_result[0];
 
 	$insert_query = "INSERT INTO Review (name, time, mid, rating, comment)
-	VALUES ('$name', '$time', 6, '$rating', '$review')";						// Hardcoded a movie id, change later
+	VALUES ('$name', '$time', '$mid', '$rating', '$review')";						
 
 	$result = mysql_query($insert_query, $db_connection);
 
 	if (!$result) 
 	{
-	    $message  = 'Invalid query: ' . mysql_error() . "\n";
-	    $message .= 'Whole query: ' . $insert_query;
-	    die($message);
+		echo "Something bad happened...Please try again! <br/>";
+	    //$message  = 'Invalid query: ' . mysql_error() . "\n";
+	    //$message .= 'Whole query: ' . $insert_query;
+	    //die($message);
 	}
 	else
-		echo "Review added succesfully! <br/>";				/* Remove later */
+		echo "Review added succesfully! <br/>";				
+
 
 }
 mysql_close($db_connection);

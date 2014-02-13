@@ -71,8 +71,8 @@ if (isset($_POST["submit"]))
 		echo "Please enter a role! <br/>";
 	else
 	{
-		echo "mid is: $_POST[mid] <br/>";		// Remove later
-		echo "aid is: $_POST[aid] <br/>";		// Remove later
+		//echo "mid is: $_POST[mid] <br/>";		
+		//echo "aid is: $_POST[aid] <br/>";		
 
 		$insert_query = "INSERT INTO MovieActor (mid, aid, role) 
 		VALUES ('$_POST[mid]', '$_POST[aid]', '$_POST[role]')";
@@ -80,9 +80,12 @@ if (isset($_POST["submit"]))
 
 		if (!$insert_result) 
 		{
+			echo "Something bad happened...Please try again! <br/>";
+			/*
     		$message  = 'Invalid query: ' . mysql_error() . "\n";
     		$message .= 'Whole query: ' . $insert_query;
     		die($message);
+    		*/
 		}
 		else
 		{

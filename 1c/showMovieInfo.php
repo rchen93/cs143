@@ -26,7 +26,7 @@ else
 	/* Generate a random valid Movie ID */
 	do {
 		$id = mt_rand(1, $max);
-		echo "ID: " . $id . "<br/>";							// Remove Later
+		//echo "ID: " . $id . "<br/>";							
 		$id_query = "SELECT * FROM Movie WHERE id=$id";
 		$result = mysql_query($id_query, $db_connection);
 	} while (mysql_num_rows($result) == 0);
@@ -138,7 +138,7 @@ if ($avg_result[0] == NULL)
 else
 	echo "Average Score: $avg_result[0]/5 (5.0 is best) based on $count_result[0] review(s). ";
 
-echo "<a href='http://192.168.56.20/~cs143/addReview.php'>Add your review!</a> <br/><br/>";
+echo "<a href='http://192.168.56.20/~cs143/addReview.php?mid=$id'>Add your review!</a> <br/><br/>";
 
 $comment_query = "SELECT * FROM Review WHERE mid=$id";
 $comment_result = mysql_query($comment_query, $db_connection);

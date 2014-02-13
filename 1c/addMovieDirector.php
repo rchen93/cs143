@@ -55,8 +55,8 @@ mysql_select_db("CS143", $db_connection);
 
 if (isset($_POST["submit"]))
 {
-	echo "mid: $_POST[mid] <br/>";
-	echo "did: $_POST[did] <br/>";
+	//echo "mid: $_POST[mid] <br/>";
+	//echo "did: $_POST[did] <br/>";
 	
 	$insert_query = "INSERT INTO MovieDirector (mid, did) 
 	VALUES ('$_POST[mid]', '$_POST[did]')";
@@ -64,9 +64,12 @@ if (isset($_POST["submit"]))
 
 	if (!$insert_result) 
 	{
+		echo "Something bad happened...Please try again! <br/>";
+		/*
 		$message  = 'Invalid query: ' . mysql_error() . "\n";
 		$message .= 'Whole query: ' . $insert_query;
 		die($message);
+		*/
 	}
 	else
 	{

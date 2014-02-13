@@ -36,12 +36,16 @@ if (isset($_POST["submit"]))
 							'%$words[0]%' OR last LIKE '%$words[0]%'";
 			$actor_result = mysql_query($actor_query, $db_connection);
 
-
-			while ($actor_row = mysql_fetch_row($actor_result))
+			if (!actor_result)
+				echo "Something bad happened...Please try again! <br/>";
+			else
 			{
-				$aid = $actor_row[0];
-				$name = "$actor_row[1] $actor_row[2]";
-				echo "<a href='http://192.168.56.20/~cs143/showActorInfo.php?aid=$aid'>$name</a> <br/>";	
+				while ($actor_row = mysql_fetch_row($actor_result))
+				{
+					$aid = $actor_row[0];
+					$name = "$actor_row[1] $actor_row[2]";
+					echo "<a href='http://192.168.56.20/~cs143/showActorInfo.php?aid=$aid'>$name</a> <br/>";	
+				}
 			}
 		}
 		else if ($length == 2)
@@ -50,11 +54,18 @@ if (isset($_POST["submit"]))
 							'%$words[0]%' AND last LIKE '%$words[1]%') OR 
 							(first LIKE '%$words[1]%' AND last LIKE '%$words[0]%')";
 			$actor_result = mysql_query($actor_query, $db_connection);
-			while ($actor_row = mysql_fetch_row($actor_result))
+
+			if (!actor_result)
+				echo "Something bad happened...Please try again! <br/>";
+
+			else
 			{
-				$aid = $actor_row[0];
-				$name = "$actor_row[1] $actor_row[2]";
-				echo "<a href='http://192.168.56.20/~cs143/showActorInfo.php?aid=$aid'>$name</a> <br/>";					
+				while ($actor_row = mysql_fetch_row($actor_result))
+				{
+					$aid = $actor_row[0];
+					$name = "$actor_row[1] $actor_row[2]";
+					echo "<a href='http://192.168.56.20/~cs143/showActorInfo.php?aid=$aid'>$name</a> <br/>";					
+				}
 			}
 		}
 		else
@@ -74,18 +85,25 @@ if (isset($_POST["submit"]))
 		}
 
 		//echo $where_clause;
-		$movie_query = "SELECT id, title FROM Movie WHERE $where_clause";
+		$movie_query = "SELECT id, title, year FROM Movie WHERE $where_clause";
 		$movie_result = mysql_query($movie_query, $db_connection);
 
-		while ($row = mysql_fetch_row($movie_result))
+		if (!movie_result)
+				echo "Something bad happened...Please try again! <br/>";
+		else
 		{
-			$mid = $row[0];
-			$title = $row[1];
 
-			echo "<a href='http://192.168.56.20/~cs143/showMovieInfo.php?mid=$mid'>" .
-			 "$title</a> <br/>";
+			while ($row = mysql_fetch_row($movie_result))
+			{
+				$mid = $row[0];
+				$title = $row[1];
+				$year = $row[2];
+
+				echo "<a href='http://192.168.56.20/~cs143/showMovieInfo.php?mid=$mid'>" .
+				 "$title ($year)</a> <br/>";
+			}
+
 		}
-
 	}
 
 

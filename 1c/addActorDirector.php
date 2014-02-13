@@ -76,7 +76,7 @@ if (isset($_POST["submit"]))
 		echo $error_message;
 	else
 	{
-		echo "All fields have been set!</br>";			/* Remove later */
+		// echo "All fields have been set!</br>";			/* Remove later */
 
 		$lookup_query = "SELECT id FROM MaxPersonID";
 		$lookup_result = mysql_fetch_row(mysql_query($lookup_query, $db_connection));
@@ -97,20 +97,22 @@ if (isset($_POST["submit"]))
 
 		if (!$result) 
 		{
-    		$message  = 'Invalid query: ' . mysql_error() . "\n";
-    		$message .= 'Whole query: ' . $insert_query;
-    		die($message);
+    		echo "Something bad happened...Please try again! <br/>";
 		}
 		else
 		{
 			echo "$_POST[identity] added successfully!<br/>";		
 			$update_query = "UPDATE MaxPersonID SET id=id+1";
-			if (mysql_query($update_query, $db_connection))
+			$update_result = mysql_query($update_query, $db_connection);
+
+			/*
+			if ($update_result)
 			{
-				echo "MaxPersonID updated!";			/* Remove later */
+				echo "MaxPersonID updated!";			
 			}
 			else
-				echo "Failed";						 	/* Remove later */
+				echo "Failed";						 	
+			*/
 		}
 	}
 

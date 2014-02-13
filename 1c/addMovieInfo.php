@@ -97,30 +97,40 @@ if (isset($_POST["submit"]))
 		{
 			$insertgenre_query = "INSERT INTO MovieGenre (mid, genre) VALUES ($id, '$genres[$i]')";
 			$mapgenre = mysql_query($insertgenre_query, $db_connection);
+			
+			/*
 			if ($mapgenre)
 			{
-				echo "'$genres[$i]'' mapped to $id </br>";			/* Remove later */
+				echo "'$genres[$i]'' mapped to $id </br>";			
 			}
 			else 
 				echo "Failed!";
+			*/
 		}
 
 		if (!$newmovie) 
 		{
+			echo "Something bad happened...Please try again! <br/>";
+			/*
     		$message  = 'Invalid query: ' . mysql_error() . "\n";
     		$message .= 'Whole query: ' . $insertmovie_query;
     		die($message);
+    		*/
 		}
 		else
 		{
 			echo "$_POST[title] added successfully!<br/>";
 			$update_query = "UPDATE MaxMovieID SET id=id+1";
-			if (mysql_query($update_query, $db_connection))
+			$update_result = mysql_query($update_query, $db_connection);
+
+			/*
+			if ($update_result)
 			{
-				echo "MaxMovieID updated!";			/* Remove later */
+				echo "MaxPersonID updated!";			
 			}
 			else
-				echo "Failed";						 	/* Remove later */
+				echo "Failed";						 	
+			*/
 		}
 
 
