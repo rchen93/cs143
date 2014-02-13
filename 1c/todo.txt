@@ -1,8 +1,0 @@
-General: ---Add a go to home link---
-		 ---Fix Submit button---
-		 -Sanitizing inputs?
-		 -showDirector.php?
-
-addActorDirector.php: ---Spacing--
-showActorInfo|MovieInfo.php: --Changed phrase--
-				   ---Add headings: e.g. first, last, title---

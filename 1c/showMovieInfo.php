@@ -17,7 +17,7 @@ $max = $lookup_result[0] - 1;
 if (isset($_GET['mid']))
 {
 	$id = $_GET['mid'];
-	echo "ID: $id <br/>"; 			// Remove later
+	//echo "ID: $id <br/>"; 			
 	$id_query = "SELECT * FROM Movie WHERE id=$id";
 	$result = mysql_query($id_query, $db_connection);
 }

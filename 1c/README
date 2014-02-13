@@ -6,13 +6,33 @@ Name: Roger Chen
 UID: 504043927
 Email: rchen93@ucla.edu
 
-We met all the criteria.
+We met all the criteria, and most of our pages used POST requests.
+Instead of having a frame to hold links to our pages, we added a 'Go Home' link
+to every page.
+
+Page I1: The layout was the same as the demo site. 
+	We implemented an extra error check to make sure valid dates were being inputted
+	and that they were in the form we wanted.
+Page I2: The layout was the same as the demo site.
+Page I3: The page can only be accessed from the B2 page, so the movie field
+	is prepopulated in the review like in the demo site. Furthermore, if there
+	was no name entered, their name would be displayed as Anonymous for the review
+Page I4: The layout was the same as the demo site, and we made sure that there
+	was some role being inputted.
+Page I5: The layout was the same as the demo site.
+Page B1: The layout was the same asthe demo site. If an actor/actress had no role
+yet, we simply outputted that they were an "Aspiring Actor/Actress"
+Page B2: The layout was the same as the demo site.
+Page S1: Used REGEXP matching for movie titles, so that searching for "Tom Hanks"
+and "Hanks Tom" would return the same movies. Also, searched for same phrase with no 
+whitespaces, e.g., searching for "CS 143" would yield the same results as "CS143".
+
 Additional feature we implemented is generating a valid random id for B1 and B2
 pages, so the information will be different everytime.
 
 The work was divided through the use of pair programming.
 We used GitHub to keep track of our code when we programmed individually.
-Kailin mainly worked on the I1, I2, I3 and aesthetics of the site.
+Kailin mainly worked on the I1, I2, I3 and overall integration/aesthetics of the site.
 Roger mainly worked on the remaining pages.
 We feel that we could have had better comments for each other in order to make
 understanding our code better.

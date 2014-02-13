@@ -28,6 +28,7 @@ if (isset($_POST["submit"]))
 		$words = preg_split('/\s+/', trim($keyword));	// Splits words by spaces
 		$length = count($words);
 
+		$nospace = preg_replace('/\s+/', '', $keyword);
 		/* Actor Query */
 		echo "<b> Searching records in Actor database... </b> <br/>";
 		if ($length == 1)
@@ -83,7 +84,8 @@ if (isset($_POST["submit"]))
 				$where_clause .= "AND title REGEXP '[[:<:]]$words[$i][[:>:]]'";
 		}
 
-		//echo $where_clause;
+		$where_clause .= "OR title='$nospace'";
+		
 		$movie_query = "SELECT id, title, year FROM Movie WHERE $where_clause";
 		$movie_result = mysql_query($movie_query, $db_connection);
 

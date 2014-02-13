@@ -72,10 +72,14 @@ if (isset($_POST["submit"]))
 	else
 	{
 		//echo "mid is: $_POST[mid] <br/>";		
-		//echo "aid is: $_POST[aid] <br/>";		
+		//echo "aid is: $_POST[aid] <br/>";
+
+		$mid = $_POST['mid'];
+		$aid = $_POST['aid'];
+		$role = $_POST['role'];		
 
 		$insert_query = "INSERT INTO MovieActor (mid, aid, role) 
-		VALUES ('$_POST[mid]', '$_POST[aid]', '$_POST[role]')";
+		VALUES ('$mid', '$aid', '$role')";
 		$insert_result = mysql_query($insert_query, $db_connection);
 
 		if (!$insert_result) 
