@@ -1,0 +1,18 @@
+a:link { 
+	color: #2e2e2e;
+	text-decoration: underline; 
+	font-size: 1em; 
+}
+
+a:visited { 
+	color: #2e2e2e; 
+	text-decoration: underline; 
+	font-size: 1em; 
+}
+
+a:hover { 
+	color: #2e2e2e; 
+	font-weight:bold; 
+	text-decoration: underline; 
+	font-size: 1.5em; 
+}
