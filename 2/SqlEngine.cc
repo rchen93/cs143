@@ -147,29 +147,19 @@ RC SqlEngine::load(const string& table, const string& loadfile, bool index)
       return 1;
   }
   
-<<<<<<< HEAD
-  while (lf.good())
-=======
-  string line; 
+  string line;
   
   while (lf.good() && getline(lf, line))
->>>>>>> 2d8edfe02ceb75667849a7c97753c55fd008d880
   {
       RecordId rid;
       int key;
       string value;
-<<<<<<< HEAD
-      string line; 
-      
-      getline(lf, line);
-=======
 
->>>>>>> 2d8edfe02ceb75667849a7c97753c55fd008d880
       parseLoadLine(line, key, value);
       rf.append(key, value, rid);
   }
   
-  fprintf(stderr, "Successful!\n");    // Remove later n 1;
+  fprintf(stderr, "Successful!\n"); // Remove later n 1;
     
   rf.close();
   lf.close();
