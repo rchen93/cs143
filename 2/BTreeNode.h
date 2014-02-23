@@ -99,6 +99,9 @@ class BTLeafNode {
     */
     RC write(PageId pid, PageFile& pf);
 
+    // Returns the maximum number of keys possible for a node
+    int getMaxCount() const;
+
   private:
    /**
     * The main memory buffer for loading the content of the disk page 
@@ -106,7 +109,7 @@ class BTLeafNode {
     */
     char buffer[PageFile::PAGE_SIZE];
 
-    struct Node;
+    struct Entry;
 
 }; 
 
@@ -182,6 +185,9 @@ class BTNonLeafNode {
     */
     RC write(PageId pid, PageFile& pf);
 
+    // Returns the maximum number of keys possible for a node
+    int getMaxCount() const;
+
   private:
    /**
     * The main memory buffer for loading the content of the disk page 
@@ -189,7 +195,7 @@ class BTNonLeafNode {
     */
     char buffer[PageFile::PAGE_SIZE];
 
-    struct Node;
+    struct Entry;
 }; 
 
 #endif /* BTNODE_H */

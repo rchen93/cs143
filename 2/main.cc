@@ -8,12 +8,17 @@
  */
  
 #include "Bruinbase.h"
-#include "SqlEngine.h"
+//#include "SqlEngine.h"
+#include "BTreeNode.h"
 
 int main()
 {
   // run the SQL engine taking user commands from standard input (console).
-  SqlEngine::run(stdin);
+  //SqlEngine::run(stdin);
+
+  BTLeafNode test;
+  int max = test.getMaxCount();
+  fprintf(stderr, "Max is: %d \n", max);
 
   return 0;
 }
