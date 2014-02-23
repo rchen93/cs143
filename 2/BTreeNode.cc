@@ -24,7 +24,11 @@ LeafNode Buffer
 BTLeafNode::BTLeafNode()
 {
 	// Zero out the buffer
-	memset(buffer, 0, PageFile::PAGE_SIZE);	
+	//memset(buffer, 0, PageFile::PAGE_SIZE);
+
+	int *intBufferPtr = (int *)buffer;
+    intBufferPtr[0] = 0;
+    intBufferPtr[255] = -1;	
 }
 
 /*
@@ -52,7 +56,8 @@ RC BTLeafNode::write(PageId pid, PageFile& pf)
 // Returns the maximum number of keys possible for a node
 int BTLeafNode::getMaxCount() const
 {
-	return (PageFile::PAGE_SIZE-sizeof(PageId)-sizeof(int))/(sizeof(Entry));
+	return sizeof(PageId);
+	//return (PageFile::PAGE_SIZE-sizeof(PageId)-sizeof(int))/(sizeof(Entry));
 }
 
 /*
@@ -159,26 +164,25 @@ RC BTNonLeafNode::write(PageId pid, PageFile& pf)
 	return pf.write(pid, buffer); 
 }
 
-// Returns the maximum number of keys possible for a node
-int getMaxCount() const
-{
-	return (PageFile::PAGE_SIZE-sizeof(PageId)-sizeof(int))/(sizeof(Entry));
-}
-
 /*
  * Return the number of keys stored in the node.
  * @return the number of keys in the node
  */
 int BTNonLeafNode::getKeyCount()
 { 
+	int *intBuffer = (int*) buffer;
+
+  	return intBuffer[0]; 
+	/*
 	int numKeys = 0;
 
 	// First four bytes in buffer holds number of keys
 	memcpy(&numKeys, &buffer, sizeof(int));
 
 	return numKeys;
-}
+	*/
 
+}
 
 /*
  * Insert a (key, pid) pair to the node.
@@ -188,7 +192,12 @@ int BTNonLeafNode::getKeyCount()
  */
 RC BTNonLeafNode::insert(int key, PageId pid)
 { 
-	return 0; 
+	if (getKeyCount() >= max_NonLeaf)
+		return RC_NODE_FULL;
+
+	int *intBuffer = (int*) buffer;
+	
+
 }
 
 /*
@@ -227,6 +236,14 @@ RC BTNonLeafNode::locateChildPtr(int searchKey, PageId& pid)
  */
 RC BTNonLeafNode::initializeRoot(PageId pid1, int key, PageId pid2)
 { 
+	int *bufferPtr = (int *) buffer;
+
+	*(bufferPtr+1) = pid1;
+	*(bufferPtr+2) = key;
+	*(bufferPtr+3) = pid2;
+	updateKeyCount(true);
+
+	/*
 	// Zero out buffer
 	memset(buffer, 0, PageFile::PAGE_SIZE);
 
@@ -241,6 +258,17 @@ RC BTNonLeafNode::initializeRoot(PageId pid1, int key, PageId pid2)
 	memcpy(pos, &pid2, sizeof(PageId));
 
 	memcpy(buffer, &i, sizeof(int));		// keycount = 1
+	*/
 
 	return 0;
+}
+
+void BTNonLeafNode::updateKeyCount(bool increment)
+{
+
+  int *intBuffer = (int*) buffer;
+  if(increment)
+    intBuffer[0]++;
+  else
+    intBuffer[0]--;
 }

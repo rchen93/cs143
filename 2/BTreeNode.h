@@ -117,10 +117,20 @@ class BTLeafNode {
 /**
  * BTNonLeafNode: The class representing a B+tree nonleaf node.
  */
+
+ /*
+* Unspanned Method:
+* NonLeafNode: [ pid | key | pid | ... | pid ]
+* 1024/4 = 256 //int array
+* 256 - 1// last pid
+* 255/2= 127 //pairs of [pid | key] entries
+* 1 unused element.
+*/
+const int max_NonLeaf = 127;
+
 class BTNonLeafNode {
   public:
 
-    BTNonLeafNode();
    /**
     * Insert a (key, pid) pair to the node.
     * Remember that all keys inside a B+tree node should be kept sorted.
@@ -185,9 +195,6 @@ class BTNonLeafNode {
     */
     RC write(PageId pid, PageFile& pf);
 
-    // Returns the maximum number of keys possible for a node
-    int getMaxCount() const;
-
   private:
    /**
     * The main memory buffer for loading the content of the disk page 
@@ -196,6 +203,8 @@ class BTNonLeafNode {
     char buffer[PageFile::PAGE_SIZE];
 
     struct Entry;
+
+    void updateKeyCout(bool increment);
 }; 
 
 #endif /* BTNODE_H */
