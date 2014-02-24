@@ -21,6 +21,11 @@ class BTLeafNode {
 
     BTLeafNode();
 
+    // Makes a LeafNode with num entries filled 
+    // skip == false: keys differ by 1
+    // skip == true: keys differ by 2
+    BTLeafNode(int num, bool skip);
+
    /**
     * Insert the (key, rid) pair to the node.
     * Remember that all keys inside a B+tree node should be kept sorted.
@@ -111,9 +116,6 @@ class BTLeafNode {
     // Deletes an entry from the buffer
     RC deleteEntry(const int eid);
 
-    // Remove this function later
-    RC emptyNode();
-
   private:
    /**
     * The main memory buffer for loading the content of the disk page 
@@ -133,14 +135,14 @@ class BTLeafNode {
  * BTNonLeafNode: The class representing a B+tree nonleaf node.
  */
       /*
-        * Unspanned Method:
+        * Unspanned:
         * NonLeafNode: [ pid | key | pid | ... | pid ]
-        * 1024/4 = 256 //int array
-        * 256 - 1// last pid
-        * 255/2= 127 //pairs of [pid | key] entries
-        * 1 unused element.
+        * 1024/4 = 256 int array
+        * 256 - 1 last pid
+        * 255/2= 127 pairs of [pid | key] entries
     */
 const int max_NonLeaf = 127;
+
 class BTNonLeafNode {
   public:
 

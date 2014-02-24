@@ -1,4 +1,5 @@
 #include "BTreeNode.h"
+#include <math.h>
 
 using namespace std;
 
@@ -23,36 +24,37 @@ LeafNode Buffer
 
 BTLeafNode::BTLeafNode()
 {
-	// Zero out the buffer
-	//memset(buffer, 0, PageFile::PAGE_SIZE);
-
 	int *intBuffer = (int *)buffer;
-    //intBuffer[0] = 0;
+    intBuffer[0] = 0;
     intBuffer[255] = -1;
-    
-/************* REMOVE LATER *********/
-	intBuffer[0] = 84;	// keycount
-	intBuffer[1] = 0;
-	intBuffer[2] = 2;
-	intBuffer[3] = 3;
-
-	intBuffer[4] = 4;
-	intBuffer[5] = 5;
-	intBuffer[6] = 6;
-
-	for (int i = 7; i < 255; i++)
-	{
-		intBuffer[i] = i;
-	}
 }
 
-/****** REMOVE LATER *********/
-RC BTLeafNode::emptyNode()
+BTLeafNode::BTLeafNode(int num, bool skip)
 {
 	int *intBuffer = (int*) buffer;
-	intBuffer[255] = -1;
 	intBuffer[0] = 0;
-	return 0;
+	intBuffer[255] = -1;
+
+	if (skip == false)
+	{
+		for (int i = 0; i < num; i++)
+		{
+			intBuffer[3*i+1] = i;
+			intBuffer[3*i+1+1] = i+1;
+			intBuffer[3*i+1+2] = i+2;
+			intBuffer[0]++;
+		}
+	}
+	else
+	{
+		for (int i = 0; i < num; i++)
+		{
+			intBuffer[3*i+1] = i*2;
+			intBuffer[3*i+1+1] = i*2+1;
+			intBuffer[3*i+1+2] = i*2+2;
+			intBuffer[0]++;
+		}
+	}
 }
 
 /*
@@ -121,6 +123,7 @@ RC BTLeafNode::insert(int key, const RecordId& rid)
 	RC rc;
 
 	rc = locate(key, eid);
+	// Empty Node or Last Entry insertion
 	if (rc != 0)
 	{
 		eid = getKeyCount();
@@ -155,7 +158,8 @@ RC BTLeafNode::insert(int key, const RecordId& rid)
 RC BTLeafNode::insertAndSplit(int key, const RecordId& rid, 
                               BTLeafNode& sibling, int& siblingKey)
 { 
-	int numMove = getKeyCount()/2;
+	double numKeys = (double)(getKeyCount());
+	int numMove = (int)(ceil(numKeys/2));
 	int numStay = getKeyCount() - numMove;
 	int readKey;
 	RecordId read_rid;
@@ -163,8 +167,10 @@ RC BTLeafNode::insertAndSplit(int key, const RecordId& rid,
 
 	RC rc;
 
-	for (int i = getKeyCount() - 1; i >= numStay; i--)
+	//fprintf(stderr, "keys: %d\n", getKeyCount());
+	for (int i = (getKeyCount() - 1); i >= numStay; i--)
 	{
+		//fprintf(stderr, "i: %d\n", i);
 		// read entry from original node
 		if (rc = readEntry(i, readKey, read_rid) != 0)
 		{
@@ -184,13 +190,22 @@ RC BTLeafNode::insertAndSplit(int key, const RecordId& rid,
 			return rc;
 		}
 	} 
-	// chceck that sibling entry is valid
-	if (rc = sibling.readEntry(0, siblingKey, read_rid) != 0)
-		return rc;
 
-	// insert into original node
-	insert(key, rid);
-	setNextNodePointer()
+	sibling.readEntry(0, siblingKey, read_rid);
+	readEntry((getKeyCount()-1), readKey, read_rid);
+
+	// if key is larger than original node, put it new node
+	if (readKey < key)
+	{
+		sibling.insert(key, rid);
+		sibling.readEntry(0, siblingKey, read_rid);
+	}
+	// otherwise, it belongs in original node
+	else
+	{
+		insert(key, rid);
+		sibling.readEntry(0, siblingKey, read_rid);
+	}
 
 	return 0;
 }
@@ -226,6 +241,9 @@ RC BTLeafNode::locate(int searchKey, int& eid)
 	int key;
 	RecordId rid;
 	RC rc;
+
+	if (getKeyCount() <= 0)
+    	return RC_INVALID_CURSOR;
 
 	for(int i = 0; i < getKeyCount(); i++)
 	{
@@ -284,6 +302,8 @@ RC BTLeafNode::setNextNodePtr(PageId pid)
 	intBuffer[255] = pid;
 	return 0;
 }
+
+/**************** LeafNode Helper Functions *********************/
 
 void BTLeafNode::updateKeyCount(bool increment)
 {
