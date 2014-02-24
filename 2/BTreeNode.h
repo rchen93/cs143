@@ -137,12 +137,13 @@ class BTLeafNode {
 class BTNonLeafNode {
   public:
 
-    //BTNonLeafNode();
+    BTNonLeafNode();
 
-    // Makes a LeafNode with num entries filled 
+    // Makes a LeafNode with num keys filled 
     // skip == false: keys differ by 1
     // skip == true: keys differ by 2
-    //BTNonLeafNode(int num, bool skip);
+    BTNonLeafNode(int num, bool skip);
+
    /**
     * Insert a (key, pid) pair to the node.
     * Remember that all keys inside a B+tree node should be kept sorted.
@@ -206,6 +207,9 @@ class BTNonLeafNode {
     * @return 0 if successful. Return an error code if there is an error.
     */
     RC write(PageId pid, PageFile& pf);
+
+    // Prints all the entries stored in the node
+    void printNode();
 
   private:
    /**

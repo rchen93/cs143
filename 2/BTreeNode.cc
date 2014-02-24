@@ -302,7 +302,7 @@ RC BTLeafNode::setNextNodePtr(PageId pid)
 	return 0;
 }
 
-/**************** LeafNode Helper Functions *********************/
+/**************** LeafNode Helper Functions ***************************************/
 
 void BTLeafNode::updateKeyCount(bool increment)
 {
@@ -347,24 +347,45 @@ void BTLeafNode::printNode()
 	}
 }
 
-/***************************** NonLeafNode ************************************/
+/***************************** NonLeafNode *******************************((((((*****/
 
-/*
+
 BTNonLeafNode::BTNonLeafNode()
 {
-	int *intBuffer = (int *)buffer;
-    intBuffer[0] = 0;
-    intBuffer[255] = -1;
+	int *intBuffer = (int*) buffer;
+	intBuffer[0] = 0;
 }
 
-// Makes a LeafNode with num entries filled 
+
+// Makes a LeafNode with num keys filled 
 // skip == false: keys differ by 1
 // skip == true: keys differ by 2
 BTNonLeafNode::BTNonLeafNode(int num, bool skip)
 {
+	int *intBuffer = (int *) buffer;
+	intBuffer[0] = 0;
 
+	if (skip == false)
+	{
+		for (int i = 0; i < num; i++)
+		{
+			intBuffer[2*i+2] = i;
+			intBuffer[2*i+2-1] = i+1;
+			updateKeyCount(true);
+		}
+	}
+	else
+	{
+		for (int i = 0; i < num; i++)
+		{
+			intBuffer[2*i+2] = 2*i;
+			intBuffer[2*i+2-1] = i+1;
+			updateKeyCount(true);
+		}
+	}
+	intBuffer[2*num+1] = 2*num+1;
 }
-*/
+
 
 /*
  * Read the content of the node from the page pid in the PageFile pf.
@@ -423,7 +444,7 @@ int BTNonLeafNode::getKeyCount()
  */
 RC BTNonLeafNode::insert(int key, PageId pid)
 { 
-	if (getKeyCount() >= max_NonLeaf)
+	if (getKeyCount() >= getMaxCount())
 		return RC_NODE_FULL;
 
 	int *intBuffer = (int*) buffer;
@@ -496,7 +517,7 @@ RC BTNonLeafNode::initializeRoot(PageId pid1, int key, PageId pid2)
 	return 0;
 }
 
-/***** NonLeafNode Helper Functions ********/
+/**************************** NonLeafNode Helper Functions ******************/
 void BTNonLeafNode::updateKeyCount(bool increment)
 {
 
@@ -505,4 +526,23 @@ void BTNonLeafNode::updateKeyCount(bool increment)
     intBuffer[0]++;
   else
     intBuffer[0]--;
+}
+
+void BTNonLeafNode::printNode()
+{
+	int *intBuffer = (int*) buffer;
+	int numkeys = getKeyCount();
+	fprintf(stderr, "Keys: %d\n", numkeys);
+
+	int pid;
+	int key;
+
+	for (int i = 0; i < numkeys; i++)
+	{
+		pid = intBuffer[2*i+2-1];
+		key = intBuffer[2*i+2];
+		fprintf(stderr, "Pid: %d Key: %d\n", pid, key);
+	}
+	fprintf(stderr, "Last Pid: %d\n", intBuffer[2*numkeys+1]);
+	
 }

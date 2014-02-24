@@ -194,12 +194,29 @@ void testLeafNode()
   testSplit();
 }
 
-void testLocate2();
+void testLocate2()
 {
-  BTNonLeafNode test;
+  BTNonLeafNode root;
   PageId pid1 = 0;
-  int key = 1;
+  int key = 3;
   PageId pid2 = 2;
+  root.initializeRoot(pid1, key, pid2);
+
+  PageId pid;
+
+  root.locateChildPtr(2, pid);
+  if (pid == 0)
+  {
+    fprintf(stderr, "Found! Pid: %d\n", pid);
+  }
+
+  BTNonLeafNode test(5, true);
+  if (test.locateChildPtr(3, pid) == 0 && pid == 3)
+  {
+    fprintf(stderr, "Found! Pid: %d\n", pid);
+  }
+  
+  test.printNode(); 
 }
 
 
@@ -215,11 +232,7 @@ int main()
 
   //testLeafNode();
 
-  BTNonLeafNode test;
-  PageId pid1 = 0;
-  int key = 1;
-  PageId pid2 = 2;
-  test.initializeRoot(pid1, key, 2);
+  testNonLeafNode();
 
   fprintf(stderr, "All tests passed!\n");
   return 0;
