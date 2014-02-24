@@ -111,6 +111,8 @@ class BTLeafNode {
 
     struct Entry;
 
+    void updateKeyCount(bool increment);
+
 }; 
 
 
@@ -204,7 +206,7 @@ class BTNonLeafNode {
 
     struct Entry;
 
-    void updateKeyCout(bool increment);
+    void updateKeyCount(bool increment);
 }; 
 
 #endif /* BTNODE_H */

@@ -56,8 +56,8 @@ RC BTLeafNode::write(PageId pid, PageFile& pf)
 // Returns the maximum number of keys possible for a node
 int BTLeafNode::getMaxCount() const
 {
-	return sizeof(PageId);
-	//return (PageFile::PAGE_SIZE-sizeof(PageId)-sizeof(int))/(sizeof(Entry));
+	//return sizeof(PageId);
+	return (PageFile::PAGE_SIZE-sizeof(PageId)-sizeof(int))/(sizeof(Entry));
 }
 
 /*
@@ -66,12 +66,17 @@ int BTLeafNode::getMaxCount() const
  */
 int BTLeafNode::getKeyCount()
 { 
+	int *intBuffer = (int*) buffer;
+
+  	return intBuffer[0]; 
+	/*
 	int numKeys = 0;
 
 	// First four bytes in buffer holds number of keys
 	memcpy(&numKeys, &buffer, sizeof(int));
 
 	return numKeys;
+	*/
 }
 
 /*
@@ -82,7 +87,10 @@ int BTLeafNode::getKeyCount()
  */
 RC BTLeafNode::insert(int key, const RecordId& rid)
 { 
-	
+	if (getKeyCount() >= getMaxCount())
+		return RC_NODE_FULL;
+
+	int *intBuffer = (int*) buffer;
 }
 
 /*
@@ -108,7 +116,18 @@ RC BTLeafNode::insertAndSplit(int key, const RecordId& rid,
  * @return 0 if successful. Return an error code if there is an error.
  */
 RC BTLeafNode::locate(int searchKey, int& eid)
-{ return 0; }
+{ 
+	/*int *intBuffer = (int*) buffer;
+
+	for(int i = 0; i < getKeyCount(); i++)
+	{
+		if (intBuffer[i]==searchKey)
+
+
+	}	
+	*/
+	return 0; 
+}
 
 /*
  * Read the (key, rid) pair from the eid entry.
@@ -118,7 +137,15 @@ RC BTLeafNode::locate(int searchKey, int& eid)
  * @return 0 if successful. Return an error code if there is an error.
  */
 RC BTLeafNode::readEntry(int eid, int& key, RecordId& rid)
-{ return 0; }
+{ 
+	if (eid < 0 || eid >= getKeyCount())
+		return RC_NO_SUCH_RECORD;
+
+	int *intBuffer = (int*) buffer;	
+
+	key = 
+	return 0; 
+}
 
 /*
  * Return the pid of the next slibling node.
@@ -135,6 +162,15 @@ PageId BTLeafNode::getNextNodePtr()
 RC BTLeafNode::setNextNodePtr(PageId pid)
 { return 0; }
 
+void BTLeafNode::updateKeyCount(bool increment)
+{
+
+  int *intBuffer = (int*) buffer;
+  if(increment)
+    intBuffer[0]++;
+  else
+    intBuffer[0]--;
+}
 
 struct BTNonLeafNode::Entry
 {

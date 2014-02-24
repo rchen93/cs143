@@ -17,8 +17,11 @@ int main()
   //SqlEngine::run(stdin);
 
   BTLeafNode test;
-  int max = test.getMaxCount();
-  fprintf(stderr, "Max is: %d \n", max);
+  RecordId rid;
+  int key;
+
+  test.readEntry(0, key, rid);
+  fprintf(stderr, "Key: %d\n Pid: %d\n Sid: %d\n", key, rid.pid, rid.sid);  
 
   return 0;
 }
