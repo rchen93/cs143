@@ -82,7 +82,6 @@ RC BTLeafNode::write(PageId pid, PageFile& pf)
 // Returns the maximum number of keys possible for a node
 int BTLeafNode::getMaxCount() const
 {
-	//return sizeof(PageId);
 	return (PageFile::PAGE_SIZE-sizeof(PageId)-sizeof(int))/(sizeof(Entry));
 }
 
@@ -348,11 +347,24 @@ void BTLeafNode::printNode()
 	}
 }
 
-struct BTNonLeafNode::Entry
+/***************************** NonLeafNode ************************************/
+
+/*
+BTNonLeafNode::BTNonLeafNode()
 {
-	int key;
-	PageId pid;
-};
+	int *intBuffer = (int *)buffer;
+    intBuffer[0] = 0;
+    intBuffer[255] = -1;
+}
+
+// Makes a LeafNode with num entries filled 
+// skip == false: keys differ by 1
+// skip == true: keys differ by 2
+BTNonLeafNode::BTNonLeafNode(int num, bool skip)
+{
+
+}
+*/
 
 /*
  * Read the content of the node from the page pid in the PageFile pf.
@@ -376,6 +388,21 @@ RC BTNonLeafNode::write(PageId pid, PageFile& pf)
 	return pf.write(pid, buffer); 
 }
 
+ // Returns the maximum number of keys possible for a node
+ /*
+    * Unspanned:
+    * NonLeafNode: [ pid | key | pid | ... | pid ]
+    * 1024/4 = 256 int array
+    * 256 - 1 last pid
+    * 255/2= 127 pairs of [pid | key] entries
+ */
+
+int BTNonLeafNode::getMaxCount() const
+{
+	return (PageFile::PAGE_SIZE-sizeof(PageId)-sizeof(int))/(2*sizeof(int));
+}
+
+
 /*
  * Return the number of keys stored in the node.
  * @return the number of keys in the node
@@ -385,14 +412,6 @@ int BTNonLeafNode::getKeyCount()
 	int *intBuffer = (int*) buffer;
 
   	return intBuffer[0]; 
-	/*
-	int numKeys = 0;
-
-	// First four bytes in buffer holds number of keys
-	memcpy(&numKeys, &buffer, sizeof(int));
-
-	return numKeys;
-	*/
 
 }
 
@@ -436,6 +455,23 @@ RC BTNonLeafNode::insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, in
  */
 RC BTNonLeafNode::locateChildPtr(int searchKey, PageId& pid)
 { 
+	int *intBuffer = (int*) buffer;
+	int keyCount = getKeyCount();
+
+	if (keyCount <= 0)
+		return RC_INVALID_CURSOR;
+
+	for (int i = 0; i < getKeyCount(); i++)
+	{
+		if (intBuffer[2*i+2] >= searchKey)
+		{
+			pid = intBuffer[2*i+1];
+			return 0;
+		}
+	}
+	// searchKey is greater than all the keys stored in the node
+	pid = intBuffer[2*(getKeyCount()-1)+3];
+
 	return 0; 
 }
 
@@ -448,33 +484,19 @@ RC BTNonLeafNode::locateChildPtr(int searchKey, PageId& pid)
  */
 RC BTNonLeafNode::initializeRoot(PageId pid1, int key, PageId pid2)
 { 
-	int *bufferPtr = (int *) buffer;
+	int *intBuffer = (int *) buffer;
 
-	*(bufferPtr+1) = pid1;
-	*(bufferPtr+2) = key;
-	*(bufferPtr+3) = pid2;
+	intBuffer[1] = pid1;
+	intBuffer[2] = key;
+	intBuffer[3] = pid2;
 	updateKeyCount(true);
 
-	/*
-	// Zero out buffer
-	memset(buffer, 0, PageFile::PAGE_SIZE);
-
-	int i = 1;
-
-	char* pos = &(buffer[0]);
-	pos += sizeof(int);			// keycount
-	memcpy(pos, &pid1, sizeof(PageId));
-	pos += sizeof(PageId);
-	memcpy(pos, &key, sizeof(int));
-	pos += sizeof(int);
-	memcpy(pos, &pid2, sizeof(PageId));
-
-	memcpy(buffer, &i, sizeof(int));		// keycount = 1
-	*/
+	//fprintf(stderr, "Max: %d\n", getMaxCount());
 
 	return 0;
 }
 
+/***** NonLeafNode Helper Functions ********/
 void BTNonLeafNode::updateKeyCount(bool increment)
 {
 

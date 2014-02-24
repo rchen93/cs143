@@ -185,13 +185,27 @@ void testSplit()
 
 }
 
-
-void testSuite()
+// Tests LeafNode functions
+void testLeafNode()
 {
-  //testRead();
-  //testLocate();
- // testInsert();
+  testRead();
+  testLocate();
+  testInsert();
   testSplit();
+}
+
+void testLocate2();
+{
+  BTNonLeafNode test;
+  PageId pid1 = 0;
+  int key = 1;
+  PageId pid2 = 2;
+}
+
+
+void testNonLeafNode()
+{
+  testLocate2();
 }
 
 int main()
@@ -199,42 +213,13 @@ int main()
   // run the SQL engine taking user commands from standard input (console).
   //SqlEngine::run(stdin);
 
-  testSuite();
- /* BTLeafNode test;
-  BTLeafNode test_sibling;
-  RecordId rid;
-  int key;
-  int eid;
-  int siblingKey;
-  RC rc;
+  //testLeafNode();
 
-  rid.pid=7;
-  rid.sid=8; 
-
-  test_sibling.emptyNode();
-  //test_sibling.printNode();
-  fprintf(stderr, "Keys Before sibling: %d\n", test_sibling.getKeyCount());
-  fprintf(stderr, "Keys Before orig: %d\n", test.getKeyCount());
-  rc = test.insertAndSplit(125, rid, test_sibling, siblingKey);
-  //fprintf(stderr, "RC: %d\n", rc);
-  fprintf(stderr, "Sibkey: %d\n", siblingKey);
-  fprintf(stderr, "Keys After sibling: %d\n", test_sibling.getKeyCount());
-  fprintf(stderr, "Keys After orig: %d\n", test.getKeyCount());
-  /*
-  test_sibling.readEntry(0, key, rid);
-  fprintf(stderr, "Key: %d\nPid: %d\nSid: %d\n", key, rid.pid, rid.sid);  
-  test_sibling.readEntry(1, key, rid);
-  fprintf(stderr, "Key: %d\nPid: %d\nSid: %d\n", key, rid.pid, rid.sid); 
-  test.readEntry(41, key, rid);
-  fprintf(stderr, "Key: %d\nPid: %d\nSid: %d\n", key, rid.pid, rid.sid); 
-  test.readEntry(43, key, rid);
-  fprintf(stderr, "Key: %d\nPid: %d\nSid: %d\n", key, rid.pid, rid.sid);
-  test.readEntry(44, key, rid);
-  fprintf(stderr, "Key: %d\nPid: %d\nSid: %d\n", key, rid.pid, rid.sid);
-  */
- /* test.printNode();
-  fprintf(stderr, "------------------------------------");
-  test_sibling.printNode();*/
+  BTNonLeafNode test;
+  PageId pid1 = 0;
+  int key = 1;
+  PageId pid2 = 2;
+  test.initializeRoot(pid1, key, 2);
 
   fprintf(stderr, "All tests passed!\n");
   return 0;

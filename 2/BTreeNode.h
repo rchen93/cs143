@@ -104,17 +104,8 @@ class BTLeafNode {
     */
     RC write(PageId pid, PageFile& pf);
 
-    // Returns the maximum number of keys possible for a node
-    int getMaxCount() const;
-
-    // Shifts entries in node one slot to the right
-    RC shift(const int eid); 
-
     // Prints all the entries stored in the node
     void printNode();
-
-    // Deletes an entry from the buffer
-    RC deleteEntry(const int eid);
 
   private:
    /**
@@ -125,8 +116,17 @@ class BTLeafNode {
 
     struct Entry;
 
+    // Updates number of keys stored
     void updateKeyCount(bool increment);
 
+    // Deletes an entry from the buffer
+    RC deleteEntry(const int eid);
+
+    // Shifts entries in node one slot to the right
+    RC shift(const int eid);
+
+    // Returns the maximum number of keys possible for a node
+    int getMaxCount() const; 
 
 }; 
 
@@ -134,18 +134,15 @@ class BTLeafNode {
 /**
  * BTNonLeafNode: The class representing a B+tree nonleaf node.
  */
-      /*
-        * Unspanned:
-        * NonLeafNode: [ pid | key | pid | ... | pid ]
-        * 1024/4 = 256 int array
-        * 256 - 1 last pid
-        * 255/2= 127 pairs of [pid | key] entries
-    */
-const int max_NonLeaf = 127;
-
 class BTNonLeafNode {
   public:
 
+    //BTNonLeafNode();
+
+    // Makes a LeafNode with num entries filled 
+    // skip == false: keys differ by 1
+    // skip == true: keys differ by 2
+    //BTNonLeafNode(int num, bool skip);
    /**
     * Insert a (key, pid) pair to the node.
     * Remember that all keys inside a B+tree node should be kept sorted.
@@ -220,6 +217,10 @@ class BTNonLeafNode {
     struct Entry;
 
     void updateKeyCount(bool increment);
+
+    // Returns the maximum number of keys possible for a node
+    int getMaxCount() const; 
+
 
 }; 
 
