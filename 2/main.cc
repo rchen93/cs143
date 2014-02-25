@@ -196,6 +196,7 @@ void testLeafNode()
 
 void testLocate2()
 {
+  fprintf(stderr, "---------------testLocate2()------------\n");
   BTNonLeafNode root;
   PageId pid1 = 0;
   int key = 3;
@@ -222,6 +223,7 @@ void testLocate2()
 
 void testInsert2()
 {
+  fprintf(stderr, "---------------testInsert2()------------\n");
   // insert at end
   BTNonLeafNode test(5, false);
   test.insert(5, 6);
@@ -237,6 +239,45 @@ void testInsert2()
   test1.printNode();
 }
 
+void testSplit2()
+{
+  fprintf(stderr, "---------------testSplit2()------------\n");
+
+  int key = 3;
+  PageId pid = 1000;
+  int midkey;
+  BTNonLeafNode empty;
+  BTNonLeafNode test(5, true);
+
+  // Split in the middle
+  test.printNode();
+  test.insertAndSplit(key, pid, empty, midkey);
+  fprintf(stderr, "midKey: %d\n", midkey);
+  test.printNode();
+  empty.printNode();
+
+  fprintf(stderr, "\n");
+  
+  // Split at beginning
+  BTNonLeafNode test2(5, true);
+  BTNonLeafNode empty2;
+
+  test2.insertAndSplit(-5, pid, empty2, midkey);
+  fprintf(stderr, "midKey: %d\n", midkey);
+  test2.printNode();
+  empty2.printNode();
+
+/*
+  // Split at end
+  BTNonLeafNode test2(5, true);
+  BTNonLeafNode empty2;
+  int key2 = 11;
+  test2.insertAndSplit(key2, pid, empty2, midkey);
+  fprintf(stderr, "midKey: %d\n", midkey);
+  test2.printNode();
+  empty2.printNode();
+  */
+}
 
 void testNonLeafNode()
 {
@@ -253,15 +294,7 @@ int main()
 
   //testNonLeafNode();
 
-  int key;
-  PageId pid;
-  int midkey;
-  BTNonLeafNode empty;
-  BTNonLeafNode test(5, false);
-
-  //test.printNode();
-  test.insertAndSplit(key, pid, empty, midkey);
-
+  testSplit2();
   fprintf(stderr, "All tests passed!\n");
   return 0;
 }
