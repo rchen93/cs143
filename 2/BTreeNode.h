@@ -211,10 +211,6 @@ class BTNonLeafNode {
     // Prints all the entries stored in the node
     void printNode();
 
-    RC readEntry(const int eid, PageId& pid, int& key);
-
-    RC insertLastPid(PageId& pid);
-
   private:
    /**
     * The main memory buffer for loading the content of the disk page 
@@ -233,8 +229,13 @@ class BTNonLeafNode {
     RC shift(const int pos);
 
     // Deletes an entry from the buffer
-    RC deleteEntry(const int pos);
+    RC deleteEntry(const int eid);
 
+    // Reads entry #    
+    RC readEntry(const int eid, PageId& pid, int& key);
+
+    // Inserts the last pageid
+    RC insertLastPid(PageId& pid);
 
 }; 
 
