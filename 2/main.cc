@@ -200,8 +200,8 @@ void testLocate2()
   PageId pid1 = 0;
   int key = 3;
   PageId pid2 = 2;
-  int pos;
   root.initializeRoot(pid1, key, pid2);
+  int pos = 0; 
 
   PageId pid;
 
@@ -222,21 +222,25 @@ void testLocate2()
 
 void testInsert2()
 {
+  // insert at end
   BTNonLeafNode test(5, false);
-  PageId pid = 1000;
-
+  test.insert(5, 6);
   test.printNode();
 
-  test.insert(6, pid);
+  // insert in middle
+  BTNonLeafNode test1(5, true);
+  test1.insert(3, 3);
+  test1.printNode();
 
-  test.printNode();
+  // insert at beginning
+  test1.insert(-2, -2);
+  test1.printNode();
 }
 
 
 void testNonLeafNode()
 {
-  //testLocate2();
-  testInsert2();
+  testLocate2();
 }
 
 int main()
@@ -246,7 +250,8 @@ int main()
 
   //testLeafNode();
 
-  testNonLeafNode();
+  //testNonLeafNode();
+  testInsert2();
 
   fprintf(stderr, "All tests passed!\n");
   return 0;

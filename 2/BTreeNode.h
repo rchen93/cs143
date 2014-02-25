@@ -211,9 +211,6 @@ class BTNonLeafNode {
     // Prints all the entries stored in the node
     void printNode();
 
-       // Shifts entries in node one slot to the right
-    RC shift(const int pos);
-
   private:
    /**
     * The main memory buffer for loading the content of the disk page 
@@ -228,6 +225,8 @@ class BTNonLeafNode {
     // Returns the maximum number of keys possible for a node
     int getMaxCount() const; 
 
+    // Shifts entries in node one slot to the right
+    RC shift(const int pos);
 
 
 }; 
