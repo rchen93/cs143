@@ -444,13 +444,37 @@ int BTNonLeafNode::getKeyCount()
  */
 RC BTNonLeafNode::insert(int key, PageId pid)
 { 
-	if (getKeyCount() >= getMaxCount())
-		return RC_NODE_FULL;
+    if (getKeyCount() >= getMaxCount())
+        return RC_NODE_FULL;
 
-	int *intBuffer = (int*) buffer;
-	
+    int *intBuffer = (int*) buffer;
+    PageId found_pid;
+    int pos;
+    RC rc; 
+    
+    rc = locateChildPtr(key, found_pid, pos);
+    
+    // Empty Node
+    if (rc != 0)
+    {
+        intBuffer[1] = pid;
+        intBuffer[2] = key; 
+        updateKeyCount(true); 
+        return 0; 
+    }
+    else
+    {
+
+        shift(pos); // shifts contents in array to allocate room for new entry
+        fprintf(stderr, "Pos: %d\n", pos);
+        intBuffer[pos] = pid;
+        intBuffer[pos+1] = key;
+        updateKeyCount(true); 
+        return 0; 
+    }
 
 }
+
 
 /*
  * Insert the (key, pid) pair to the node
@@ -474,7 +498,7 @@ RC BTNonLeafNode::insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, in
  * @param pid[OUT] the pointer to the child node to follow.
  * @return 0 if successful. Return an error code if there is an error.
  */
-RC BTNonLeafNode::locateChildPtr(int searchKey, PageId& pid)
+RC BTNonLeafNode::locateChildPtr(int searchKey, PageId& pid, int& pos)
 { 
 	int *intBuffer = (int*) buffer;
 	int keyCount = getKeyCount();
@@ -487,11 +511,13 @@ RC BTNonLeafNode::locateChildPtr(int searchKey, PageId& pid)
 		if (intBuffer[2*i+2] >= searchKey)
 		{
 			pid = intBuffer[2*i+1];
+			pos = 2*i + 1;
 			return 0;
 		}
 	}
 	// searchKey is greater than all the keys stored in the node
 	pid = intBuffer[2*(getKeyCount()-1)+3];
+	pos = 2*(getKeyCount()-1)+3;
 
 	return 0; 
 }
@@ -545,4 +571,21 @@ void BTNonLeafNode::printNode()
 	}
 	fprintf(stderr, "Last Pid: %d\n", intBuffer[2*numkeys+1]);
 	
+}
+
+RC BTNonLeafNode::shift(const int pos)
+{
+    if (pos < 0)
+        return RC_INVALID_CURSOR;
+
+    
+    int *intBuffer = (int*) buffer;
+    // manually shift each element in buffer, in blocks of 2, since each entry has 2 elements
+    for (int i = 2*getKeyCount()+1; i >= pos; i--) 
+    {
+        //fprintf(stderr, "%d ", intBuffer[i]);
+        intBuffer[i+2] = intBuffer[i];  
+        intBuffer[i] = -1;
+        //fprintf(stderr, "%d ", intBuffer[i+3]);
+    }
 }
