@@ -476,23 +476,6 @@ RC BTNonLeafNode::insert(int key, PageId pid)
 }
 
 
-RC BTNonLeafNode::shift(const int pos)
-{
-    if (pos < 0)
-        return RC_INVALID_CURSOR;
-
-    
-    int *intBuffer = (int*) buffer;
-    // manually shift each element in buffer, in blocks of 2, since each entry has 2 elements
-    for (int i = 2*getKeyCount()+1; i >= pos; i--) 
-    {
-        //fprintf(stderr, "%d ", intBuffer[i]);
-        intBuffer[i+2] = intBuffer[i];  
-        intBuffer[i] = -1;
-        //fprintf(stderr, "%d ", intBuffer[i+3]);
-    }
-}
-
 /*
  * Insert the (key, pid) pair to the node
  * and split the node half and half with sibling.
@@ -505,7 +488,7 @@ RC BTNonLeafNode::shift(const int pos)
  */
 RC BTNonLeafNode::insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, int& midKey)
 { 
-    return 0; 
+	return 0; 
 }
 
 /*
@@ -517,26 +500,26 @@ RC BTNonLeafNode::insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, in
  */
 RC BTNonLeafNode::locateChildPtr(int searchKey, PageId& pid, int& pos)
 { 
-    int *intBuffer = (int*) buffer;
-    int keyCount = getKeyCount();
+	int *intBuffer = (int*) buffer;
+	int keyCount = getKeyCount();
 
-    if (keyCount <= 0)
-        return RC_INVALID_CURSOR;
+	if (keyCount <= 0)
+		return RC_INVALID_CURSOR;
 
-    for (int i = 0; i < getKeyCount(); i++)
-    {
-        if (intBuffer[2*i+2] >= searchKey)
-        {
-            pid = intBuffer[2*i+1];
-            pos = 2*i + 1;
-            return 0;
-        }
-    }
-    // searchKey is greater than all the keys stored in the node
-    pid = intBuffer[2*(getKeyCount()-1)+3];
-    pos = 2*(getKeyCount()-1)+3;
+	for (int i = 0; i < getKeyCount(); i++)
+	{
+		if (intBuffer[2*i+2] >= searchKey)
+		{
+			pid = intBuffer[2*i+1];
+			pos = 2*i + 1;
+			return 0;
+		}
+	}
+	// searchKey is greater than all the keys stored in the node
+	pid = intBuffer[2*(getKeyCount()-1)+3];
+	pos = 2*(getKeyCount()-1)+3;
 
-    return 0; 
+	return 0; 
 }
 
 /*
@@ -548,16 +531,16 @@ RC BTNonLeafNode::locateChildPtr(int searchKey, PageId& pid, int& pos)
  */
 RC BTNonLeafNode::initializeRoot(PageId pid1, int key, PageId pid2)
 { 
-    int *intBuffer = (int *) buffer;
+	int *intBuffer = (int *) buffer;
 
-    intBuffer[1] = pid1;
-    intBuffer[2] = key;
-    intBuffer[3] = pid2;
-    updateKeyCount(true);
+	intBuffer[1] = pid1;
+	intBuffer[2] = key;
+	intBuffer[3] = pid2;
+	updateKeyCount(true);
 
-    //fprintf(stderr, "Max: %d\n", getMaxCount());
+	//fprintf(stderr, "Max: %d\n", getMaxCount());
 
-    return 0;
+	return 0;
 }
 
 /**************************** NonLeafNode Helper Functions ******************/
@@ -588,4 +571,21 @@ void BTNonLeafNode::printNode()
 	}
 	fprintf(stderr, "Last Pid: %d\n", intBuffer[2*numkeys+1]);
 	
+}
+
+RC BTNonLeafNode::shift(const int pos)
+{
+    if (pos < 0)
+        return RC_INVALID_CURSOR;
+
+    
+    int *intBuffer = (int*) buffer;
+    // manually shift each element in buffer, in blocks of 2, since each entry has 2 elements
+    for (int i = 2*getKeyCount()+1; i >= pos; i--) 
+    {
+        //fprintf(stderr, "%d ", intBuffer[i]);
+        intBuffer[i+2] = intBuffer[i];  
+        intBuffer[i] = -1;
+        //fprintf(stderr, "%d ", intBuffer[i+3]);
+    }
 }
