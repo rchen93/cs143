@@ -175,7 +175,7 @@ class BTNonLeafNode {
     * @param pid[OUT] the pointer to the child node to follow.
     * @return 0 if successful. Return an error code if there is an error.
     */
-    RC locateChildPtr(int searchKey, PageId& pid);
+    RC locateChildPtr(int searchKey, PageId& pid, int& pos);
 
    /**
     * Initialize the root node with (pid1, key, pid2).
@@ -224,6 +224,9 @@ class BTNonLeafNode {
 
     // Returns the maximum number of keys possible for a node
     int getMaxCount() const; 
+
+    // Shifts entries in node one slot to the right
+    RC shift(const int pos);
 
 
 }; 
