@@ -154,6 +154,8 @@ RC BTLeafNode::insert(int key, const RecordId& rid)
  * @param siblingKey[OUT] the first key in the sibling node after split.
  * @return 0 if successful. Return an error code if there is an error.
  */
+
+ // TO FIX: INSERTION AFTER SPLIT??
 RC BTLeafNode::insertAndSplit(int key, const RecordId& rid, 
                               BTLeafNode& sibling, int& siblingKey)
 { 
@@ -412,15 +414,15 @@ RC BTNonLeafNode::write(PageId pid, PageFile& pf)
  // Returns the maximum number of keys possible for a node
  /*
     * Unspanned:
-    * NonLeafNode: [ pid | key | pid | ... | pid ]
+    * NonLeafNode: [ kc | pid | key | pid | ... | pid ]
     * 1024/4 = 256 int array
-    * 256 - 1 last pid
-    * 255/2= 127 pairs of [pid | key] entries
+    * 256 - 1 - 1 last pid and keycount
+    * 254/2= 127 pairs of [pid | key] entries
  */
 
 int BTNonLeafNode::getMaxCount() const
 {
-	return (PageFile::PAGE_SIZE-sizeof(PageId)-sizeof(int))/(2*sizeof(int));
+	return (PageFile::PAGE_SIZE-sizeof(PageId)-2*sizeof(int))/(2*sizeof(int));
 }
 
 
@@ -466,31 +468,13 @@ RC BTNonLeafNode::insert(int key, PageId pid)
     {
 
         shift(pos); // shifts contents in array to allocate room for new entry
-        fprintf(stderr, "Pos: %d\n", pos);
+        // fprintf(stderr, "Pos: %d\n", pos);
         intBuffer[pos] = pid;
         intBuffer[pos+1] = key;
         updateKeyCount(true); 
         return 0; 
     }
 
-}
-
-
-RC BTNonLeafNode::shift(const int pos)
-{
-    if (pos < 0)
-        return RC_INVALID_CURSOR;
-
-    
-    int *intBuffer = (int*) buffer;
-    // manually shift each element in buffer, in blocks of 2, since each entry has 2 elements
-    for (int i = 2*getKeyCount()+1; i >= pos; i--) 
-    {
-        //fprintf(stderr, "%d ", intBuffer[i]);
-        intBuffer[i+2] = intBuffer[i];  
-        intBuffer[i] = -1;
-        //fprintf(stderr, "%d ", intBuffer[i+3]);
-    }
 }
 
 /*
@@ -505,6 +489,42 @@ RC BTNonLeafNode::shift(const int pos)
  */
 RC BTNonLeafNode::insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, int& midKey)
 { 
+	// +1 for the key we're going to insert
+	// maybe change getKeyCount() to maxCount() later because
+	// split is only called on maxnode?
+
+	double numKeys = (double)(getKeyCount()+1);
+	int numMove = (int)(ceil(numKeys/2));
+	int numStay = getKeyCount() - numMove;
+
+	int *intBuffer = (int*) buffer;
+	char tempBuffer[PageFile::PAGE_SIZE+4+4];		// +4 for key, +4 for pid
+	int *temp_intBuffer = (int*) tempBuffer;
+	//fprintf(stderr, "size: %d\n", sizeof(tempbuffer)/sizeof(*tempbuffer));
+
+	PageId locate_pid;
+	int pos;
+
+	// Find where the key would be inserted 
+	locateChildPtr(key, locate_pid, pos);
+
+
+	// Copy contents of original buffer into temp buffer
+	memcpy(temp_intBuffer, intBuffer, PageFile::PAGE_SIZE);
+	temp_intBuffer[0]++;					
+
+
+/*
+	fprintf(stderr, "Keys: %d\n", temp_intBuffer[0]);
+
+	for (int i = 0; i < getKeyCount(); i++)
+	{
+		pid = temp_intBuffer[2*i+2-1];
+		key = temp_intBuffer[2*i+2];
+		fprintf(stderr, "Pid: %d Key: %d\n", pid, key);
+	}
+*/
+
     return 0; 
 }
 
@@ -588,4 +608,21 @@ void BTNonLeafNode::printNode()
 	}
 	fprintf(stderr, "Last Pid: %d\n", intBuffer[2*numkeys+1]);
 	
+}
+
+RC BTNonLeafNode::shift(const int pos)
+{
+    if (pos < 0)
+        return RC_INVALID_CURSOR;
+
+    
+    int *intBuffer = (int*) buffer;
+    // manually shift each element in buffer, in blocks of 2, since each entry has 2 elements
+    for (int i = 2*getKeyCount()+1; i >= pos; i--) 
+    {
+        //fprintf(stderr, "%d ", intBuffer[i]);
+        intBuffer[i+2] = intBuffer[i];  
+        intBuffer[i] = -1;
+        //fprintf(stderr, "%d ", intBuffer[i+3]);
+    }
 }

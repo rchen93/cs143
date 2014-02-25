@@ -241,6 +241,7 @@ void testInsert2()
 void testNonLeafNode()
 {
   testLocate2();
+  testInsert2();
 }
 
 int main()
@@ -251,7 +252,15 @@ int main()
   //testLeafNode();
 
   //testNonLeafNode();
-  testInsert2();
+
+  int key;
+  PageId pid;
+  int midkey;
+  BTNonLeafNode empty;
+  BTNonLeafNode test(5, false);
+
+  //test.printNode();
+  test.insertAndSplit(key, pid, empty, midkey);
 
   fprintf(stderr, "All tests passed!\n");
   return 0;
