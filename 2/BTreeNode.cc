@@ -357,6 +357,7 @@ BTNonLeafNode::BTNonLeafNode()
 {
 	int *intBuffer = (int*) buffer;
 	intBuffer[0] = 0;
+	intBuffer[1] = -1;
 }
 
 
@@ -367,13 +368,14 @@ BTNonLeafNode::BTNonLeafNode(int num, bool skip)
 {
 	int *intBuffer = (int *) buffer;
 	intBuffer[0] = 0;
+	intBuffer[1] = 2*num+1;
 
 	if (skip == false)
 	{
 		for (int i = 0; i < num; i++)
 		{
 			intBuffer[2*i+2] = i;
-			intBuffer[2*i+2-1] = i+1;
+			intBuffer[2*i+2+1] = i+1;
 			updateKeyCount(true);
 		}
 	}
@@ -382,11 +384,10 @@ BTNonLeafNode::BTNonLeafNode(int num, bool skip)
 		for (int i = 0; i < num; i++)
 		{
 			intBuffer[2*i+2] = 2*i;
-			intBuffer[2*i+2-1] = i+1;
+			intBuffer[2*i+2+1] = i+1;
 			updateKeyCount(true);
 		}
 	}
-	intBuffer[2*num+1] = 2*num+1;
 }
 
 
@@ -458,10 +459,12 @@ RC BTNonLeafNode::insert(int key, PageId pid)
     rc = locateChildPtr(key, found_pid, pos);
     
     // Empty Node
+    // Used only when you have leaf node overflow, so leftmost pid should be passed in fron leaf node
+    // All pid point to values larger than or equal to key
     if (rc != 0)
     {
-        intBuffer[1] = pid;
-        intBuffer[2] = key; 
+        intBuffer[2] = key;
+        intBuffer[3] = pid; 
         updateKeyCount(true); 
         return 0; 
     }
@@ -470,8 +473,8 @@ RC BTNonLeafNode::insert(int key, PageId pid)
 
         shift(pos); // shifts contents in array to allocate room for new entry
         // fprintf(stderr, "Pos: %d\n", pos);
-        intBuffer[pos] = pid;
-        intBuffer[pos+1] = key;
+        intBuffer[pos] = key;
+        intBuffer[pos+1] = pid;
         updateKeyCount(true); 
         return 0; 
     }
@@ -493,26 +496,26 @@ RC BTNonLeafNode::insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, in
 	// +1 for the key we're going to insert
 	// maybe change getKeyCount() to maxCount() later because
 	// split is only called on maxnode?
+	// inserted as (key, pid)
 
 	double numKeys = (double)(getKeyCount());
 	int numMove = (int)(ceil(numKeys/2));
 	int numStay = getKeyCount() - numMove;
 
 	int *intBuffer = (int*) buffer;
-	int first_pid = intBuffer[1];
 	int first_key = intBuffer[2];
-	bool flag = false;				// flag if we have inserted our key
+	int first_pid = intBuffer[3];
+	//bool flag = false;				// flag if we have inserted our key
 
 	// Put (key,pid) at front of buffer
-	intBuffer[1] = pid;
 	intBuffer[2] = key;
+	intBuffer[3] = pid;
 
 	PageId read_pid;
 	int read_key;
 	RC rc;
 
 	// Insertion Sort
-	// WHAT DO I DO WITH LAST PID WhEN I INSERT At END? use flag for now
 	for (int i = 0; i < getKeyCount()-1; i++)
 	{
 		readEntry(i+1, read_pid, read_key);
@@ -520,68 +523,74 @@ RC BTNonLeafNode::insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, in
 		// if key we want to insert is larger than the adjacent key, swap them
 		if (read_pid < key)
 		{
-			intBuffer[2*(i+1)+1] = pid;
 			intBuffer[2*(i+1)+2] = key;
-			intBuffer[2*i+1] = read_pid;
+			intBuffer[2*(i+1)+3] = pid;
 			intBuffer[2*i+2] = read_key;
+			intBuffer[2*i+3] = read_pid;
 		}
 		else
 		{
-			flag = true;
+			//flag = true;
 			break;
 		}
 	}
 
 	// Split
-	if (flag == true)
+	PageId beginning_pid = intBuffer[1];
+	for (int i = (getKeyCount() - 1); i >= numStay; i--)
 	{
-		PageId last_pid = intBuffer[2*getKeyCount()+1];
-		for (int i = (getKeyCount() - 1); i >= numStay; i--)
+		// read entry from original node
+		if (rc = readEntry(i, read_pid, read_key) != 0)
 		{
-			// read entry from original node
-			if (rc = readEntry(i, read_pid, read_key) != 0)
-			{
-				fprintf(stderr, "Here1\n");
-				return rc;
-			}
-			// insert into sibling node
-			if (rc = sibling.insert(read_key, read_pid) != 0)
-			{
-				fprintf(stderr, "Here2\n");
-				return rc;
-			}
-			// delete entry from original buffer
-			if (rc = deleteEntry(i) != 0)
-			{
-				fprintf(stderr, "Here3\n");
-				return rc;
-			}
-		} 
+			fprintf(stderr, "Here1\n");
+			return rc;
+		}
+		// insert into sibling node
+		if (rc = sibling.insert(read_key, read_pid) != 0)
+		{
+			fprintf(stderr, "Here2\n");
+			return rc;
+		}
+		// delete entry from original buffer
+		if (rc = deleteEntry(i) != 0)
+		{
+			fprintf(stderr, "Here3\n");
+			return rc;
+		}
+	} 
 
-		// insert first key back into original buffer
-		insert(first_key, first_pid);
+	// insert first key back into original buffer
+	insert(first_key, first_pid);
 
-		sibling.insertLastPid(last_pid);
+	//sibling.insertFirstPid(beginning_pid);
 
+	// if the new node has at least the same amount of keys
+	// as original, return middle key from the new node
+	// because left deep tree
+	if (sibling.getKeyCount() >= getKeyCount())
+	{
 		sibling.readEntry(0, read_pid, read_key);
 		midKey = read_key;
-
-		return 0;
-
 	}
-	// key we want to insert belongs at end
 	else
 	{
-
+		readEntry(getKeyCount()-1, read_pid, read_key);
+		midKey = read_key;
 	}
+	return 0;
 
-    return 0; 
+	
+	// key we want to insert belongs at end
+	/*else
+	{
+
+	}*/
 }
 
-RC BTNonLeafNode::insertLastPid(PageId& pid)
+RC BTNonLeafNode::insertFirstPid(PageId& pid)
 {
 	int *intBuffer = (int*) buffer;
-	intBuffer[2*getKeyCount()+1] = pid;
+	intBuffer[1] = pid;
 	
 	return 0;
 }
@@ -594,8 +603,8 @@ RC BTNonLeafNode::readEntry(const int eid, PageId& pid, int& key)
 
 	int *intBuffer = (int*) buffer;
 
-	pid = intBuffer[2*eid+1];
 	key = intBuffer[2*eid+2];
+	pid = intBuffer[2*eid+3];
 
 	return 0;
 
@@ -620,14 +629,14 @@ RC BTNonLeafNode::locateChildPtr(int searchKey, PageId& pid, int& pos)
     {
         if (intBuffer[2*i+2] >= searchKey)
         {
-            pid = intBuffer[2*i+1];
-            pos = 2*i + 1;
+            pid = intBuffer[2*i+2-1];
+            pos = 2*i+2;
             return 0;
         }
     }
     // searchKey is greater than all the keys stored in the node
     pid = intBuffer[2*(getKeyCount()-1)+3];
-    pos = 2*(getKeyCount()-1)+3;
+    pos = 2*(getKeyCount()-1)+3+1;
 
     return 0; 
 }
@@ -673,13 +682,14 @@ void BTNonLeafNode::printNode()
 	int pid;
 	int key;
 
+	fprintf(stderr, "First Pid: %d\n", intBuffer[1]);
 	for (int i = 0; i < numkeys; i++)
 	{
-		pid = intBuffer[2*i+2-1];
 		key = intBuffer[2*i+2];
-		fprintf(stderr, "Pid: %d Key: %d\n", pid, key);
+		pid = intBuffer[2*i+2+1];
+		fprintf(stderr, "Key: %d Pid: %d\n", key, pid);
 	}
-	fprintf(stderr, "Last Pid: %d\n", intBuffer[2*numkeys+1]);
+	
 	
 }
 
@@ -707,8 +717,8 @@ RC BTNonLeafNode::deleteEntry(const int eid)
 
 	int* intBuffer = (int*) buffer;
 
-	intBuffer[2*eid+1] = -1;
-	intBuffer[2*eid+1+1] = -1; 
+	intBuffer[2*eid+2] = -1;
+	intBuffer[2*eid+2+1] = -1; 
 
 	updateKeyCount(false);
 

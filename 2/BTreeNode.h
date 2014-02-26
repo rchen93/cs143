@@ -235,7 +235,7 @@ class BTNonLeafNode {
     RC readEntry(const int eid, PageId& pid, int& key);
 
     // Inserts the last pageid
-    RC insertLastPid(PageId& pid);
+    RC insertFirstPid(PageId& pid);
 
 }; 
 

@@ -206,14 +206,19 @@ void testLocate2()
 
   PageId pid;
 
-  root.locateChildPtr(2, pid, pos);
+  root.locateChildPtr(-1, pid, pos);
   if (pid == 0)
   {
     fprintf(stderr, "Found! Pid: %d\n", pid);
   }
 
   BTNonLeafNode test(5, true);
-  if (test.locateChildPtr(3, pid, pos) == 0 && pid == 3)
+  if (test.locateChildPtr(3, pid, pos) == 0 && pid == 2)
+  {
+    fprintf(stderr, "Found! Pid: %d\n", pid);
+  }
+
+  if(test.locateChildPtr(9, pid, pos) == 0 && pid == 5)
   {
     fprintf(stderr, "Found! Pid: %d\n", pid);
   }
@@ -226,12 +231,12 @@ void testInsert2()
   fprintf(stderr, "---------------testInsert2()------------\n");
   // insert at end
   BTNonLeafNode test(5, false);
-  test.insert(5, 6);
+  test.insert(6, 5);
   test.printNode();
 
   // insert in middle
   BTNonLeafNode test1(5, true);
-  test1.insert(3, 3);
+  test1.insert(3, 90);
   test1.printNode();
 
   // insert at beginning
@@ -259,7 +264,7 @@ void testSplit2()
   fprintf(stderr, "\n");
   
   // Split at beginning
-  BTNonLeafNode test2(5, true);
+  BTNonLeafNode test2(4, true);
   BTNonLeafNode empty2;
 
   test2.insertAndSplit(-5, pid, empty2, midkey);
@@ -267,22 +272,24 @@ void testSplit2()
   test2.printNode();
   empty2.printNode();
 
-/*
+  fprintf(stderr, "\n");
+  
   // Split at end
-  BTNonLeafNode test2(5, true);
-  BTNonLeafNode empty2;
-  int key2 = 11;
-  test2.insertAndSplit(key2, pid, empty2, midkey);
+  BTNonLeafNode test3(5, true);
+  BTNonLeafNode empty3;
+  int key3 = 11;
+  test3.insertAndSplit(key3, pid, empty3, midkey);
   fprintf(stderr, "midKey: %d\n", midkey);
-  test2.printNode();
-  empty2.printNode();
-  */
+  test3.printNode();
+  empty3.printNode();
+
 }
 
 void testNonLeafNode()
 {
-  testLocate2();
-  testInsert2();
+  //testLocate2();
+  //testInsert2();
+  testSplit2();
 }
 
 int main()
@@ -292,9 +299,8 @@ int main()
 
   //testLeafNode();
 
-  //testNonLeafNode();
-
-  testSplit2();
+  testNonLeafNode();
+  
   fprintf(stderr, "All tests passed!\n");
   return 0;
 }
