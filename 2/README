@@ -1,0 +1,17 @@
+Name: Kailin Chang
+UID: 503999157
+Email: klcathy@ucla.edu
+
+Name: Roger Chen 
+UID: 504043927
+Email: rchen93@ucla.edu
+
+Our nodes were designed to hold the keycount of the node at the very first position in the buffer.
+We made some helper functions such as shifting the entries, and deleting the entries from the buffer.
+For insertandsplit of nonleafnodes, we used an insertion sort algorithm to figure out where the key should go
+because we can't simply "insert" into a full buffer.
+
+The work was divided through the use of pair programming.
+We used GitHub to keep track of our code when we programmed individually.
+We feel that we could have had better comments for each other in order to make
+understanding our code better.
