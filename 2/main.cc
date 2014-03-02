@@ -294,26 +294,57 @@ void testNonLeafNode()
   testSplit2();
 }
 
+/*
 void testReadForward()
 {
-  //RecordFile rf; 
-  //BTreeIndex index; 
+  RecordFile rf; 
+  BTreeIndex index; 
+  IndexCursor cursor;
 
-  //rf.open('xsmall.tbl', 'r');
-  //index.open('xsmall.idx')
+  int key;
+  string value;
+  RecordId rid;
+  int count;
+
+  if (rf.open('xsmall.tbl', 'r') != 0)
+      fprintf(stderr, "Could not open record file\n");
+  if (index.open('xsmall.idx', 'w') != 0)
+      fprintf(stderr, "Could not open index\n");
+  if (index.locate(0, cursor) != 0)
+      fprintf(stderr, "Could not locate cursor\n");
+
+  count = 0;
+
+  while (!index.readForward(cursor, key, rid))
+  {
+    fprintf(stderr, "Pid: %d Sid: %d ", rid.pid, rid.sid);
+    rf.read(rid, key, value);
+    fprintf(stderr, "Key: %d Value: %d\n", key, value);
+    count++;
+  }
+  fprintf(stderr, "Count: %d\n", count);
+
 }
+*/
 
 int main()
 {
   // run the SQL engine taking user commands from standard input (console).
-  //SqlEngine::run(stdin);
+  // SqlEngine::run(stdin);
 
   //testLeafNode();
 
   //testNonLeafNode();
 
-  testReadForward(); 
+  //testReadForward(); 
   
+  BTreeIndex index; 
+  IndexCursor cursor;
+
+  if (index.open("test.idx", 'w') != 0)
+      fprintf(stderr, "Could not open index\n");
+  index.locate(5, cursor);
+
   fprintf(stderr, "All tests passed!\n");
   return 0;
 }

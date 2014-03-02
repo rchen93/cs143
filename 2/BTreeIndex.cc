@@ -46,7 +46,7 @@ RC BTreeIndex::open(const string& indexname, char mode)
 		intBuffer[0] = rootPid;
 		intBuffer[1] = treeHeight;
 
-		fprintf(stderr, "Empty: Root: %d Height: %d\n", rootPid, treeHeight);
+		fprintf(stderr, "Empty: RootPid: %d Height: %d\n", intBuffer[0], intBuffer[1]);
 		pf.write(0, buffer);
 	}
 	// Read contents of file
@@ -58,7 +58,7 @@ RC BTreeIndex::open(const string& indexname, char mode)
 		rootPid = intBuffer[0];
 		treeHeight = intBuffer[1];
 
-		fprintf(stderr, "Existng: Root: %d Height: %d\n", rootPid, treeHeight);
+		fprintf(stderr, "Existing: RootPid: %d Height: %d\n", rootPid, treeHeight);
 	}
 
     return 0;
@@ -92,6 +92,18 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
 }
 
 /*
+	Helper for insert
+	level: level we are searching the B+ tree on
+	pid: PageId of the node we are currently on
+	siblingKey: key to insert if there is overflow, otherwise -1
+	siblingPid: PageId to insert if there is overflow, otherwise -1
+*/
+RC insertHelper(int key, const RecordId& rid, int level, PageId pid, int& siblingKey, PageId& siblingPid)
+{
+
+}
+
+/*
  * Find the leaf-node index entry whose key value is larger than or 
  * equal to searchKey, and output the location of the entry in IndexCursor.
  * IndexCursor is a "pointer" to a B+tree leaf-node entry consisting of
@@ -114,28 +126,38 @@ RC BTreeIndex::locate(int searchKey, IndexCursor& cursor)
 {
 	BTNonLeafNode* nonleaf = new BTNonLeafNode(); 
 	BTLeafNode* leaf = new BTLeafNode(); 
-	PageId pid; 
+	PageId pid = rootPid; 
 	int pos; 
 
 
-	// search through nonleaf nodes for currect pid
+	// search through nonleaf nodes for correct pid
 	for (int i = 1; i < treeHeight; i++)
 	{
-		nonleaf.locateChildPtr(searchKey, pid, pos);
+		nonleaf->read(pid, pf);
+		fprintf(stderr, "Pid: %d\n", pid);
+		nonleaf->locateChildPtr(searchKey, pid, pos);
+		fprintf(stderr, "ChildPid: %d\n", pid);
 	}
 
+	// pid now points to a leaf node
 	cursor.pid = pid; 
+	fprintf(stderr, "PageId: %d\n", cursor.pid);
 
-	// not sure if right: GO TO LEAF POINTED TO BY PID AND DO LOCATE
-	PageFile pf = PageFile(); 
-	leaf.read(cursor.pid, pf);
-	rc = leaf.locate(key, cursor.eid);
+	// read the leaf
+	leaf->read(cursor.pid, pf);
+
+	RC rc = leaf->locate(searchKey, cursor.eid);
 
 	delete leaf; 
 	delete nonleaf; 
 
 	if (rc != 0)
-		return RC_NO_SUCH_RECORD; 
+	{
+		fprintf(stderr, "Not found in this leaf node\n");
+		return rc;
+	} 
+
+	fprintf(stderr, "EntryId: %d\n", cursor.eid);
 
     return 0;
 }
@@ -151,22 +173,27 @@ RC BTreeIndex::locate(int searchKey, IndexCursor& cursor)
 RC BTreeIndex::readForward(IndexCursor& cursor, int& key, RecordId& rid)
 {
    BTLeafNode *leaf = new BTLeafNode();
-	//BTLeafNode* leaf; 
-   PageFile pf = PageFile(); 
+	//BTLeafNode* leaf;  
    
    leaf -> read(cursor.pid, pf);
    RC rc = leaf -> readEntry(cursor.eid, key, rid);
    if (rc != 0)
+   {
+   	   fprintf(stderr, "Entry does not exist\n");
+   	   delete leaf;
        return rc;
-       
+   }   
+   fprintf(stderr, "Eid: %d Key: %d Rid: %d\n", cursor.eid, key, rid);
    // last entry in node
    if (cursor.eid == (leaf -> getKeyCount() - 1))
    {
+   	   fprintf(stderr, "Moving to next sibling leaf\n");
        cursor.pid = leaf -> getNextNodePtr();
        cursor.eid = 0;
    }
    else
        cursor.eid++;
+   fprintf(stderr, "Updated Eid; %d\n", cursor.eid);
    delete leaf;
    return 0;
 }
