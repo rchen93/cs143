@@ -54,7 +54,7 @@ RC BTreeIndex::open(const string& indexname, char mode)
 	{
 		char buffer[PageFile::PAGE_SIZE];
 		pf.read(0, buffer);
-		int intBuffer = (int*) buffer;
+		int *intBuffer = (int*) buffer;
 		rootPid = intBuffer[0];
 		treeHeight = intBuffer[1];
 
@@ -112,6 +112,31 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
  */
 RC BTreeIndex::locate(int searchKey, IndexCursor& cursor)
 {
+	BTNonLeafNode* nonleaf = new BTNonLeafNode(); 
+	BTLeafNode* leaf = new BTLeafNode(); 
+	PageId pid; 
+	int pos; 
+
+
+	// search through nonleaf nodes for currect pid
+	for (int i = 1; i < treeHeight; i++)
+	{
+		nonleaf.locateChildPtr(searchKey, pid, pos);
+	}
+
+	cursor.pid = pid; 
+
+	// not sure if right: GO TO LEAF POINTED TO BY PID AND DO LOCATE
+	PageFile pf = PageFile(); 
+	leaf.read(cursor.pid, pf);
+	rc = leaf.locate(key, cursor.eid);
+
+	delete leaf; 
+	delete nonleaf; 
+
+	if (rc != 0)
+		return RC_NO_SUCH_RECORD; 
+
     return 0;
 }
 
@@ -125,5 +150,23 @@ RC BTreeIndex::locate(int searchKey, IndexCursor& cursor)
  */
 RC BTreeIndex::readForward(IndexCursor& cursor, int& key, RecordId& rid)
 {
-    return 0;
+   BTLeafNode *leaf = new BTLeafNode();
+	//BTLeafNode* leaf; 
+   PageFile pf = PageFile(); 
+   
+   leaf -> read(cursor.pid, pf);
+   RC rc = leaf -> readEntry(cursor.eid, key, rid);
+   if (rc != 0)
+       return rc;
+       
+   // last entry in node
+   if (cursor.eid == (leaf -> getKeyCount() - 1))
+   {
+       cursor.pid = leaf -> getNextNodePtr();
+       cursor.eid = 0;
+   }
+   else
+       cursor.eid++;
+   delete leaf;
+   return 0;
 }

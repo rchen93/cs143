@@ -276,7 +276,7 @@ PageId BTLeafNode::getNextNodePtr()
 }
 
 /*
- * Set the pid of the next slibling node.
+ * Set the pid of the next sibling node.
  * @param pid[IN] the PageId of the next sibling node 
  * @return 0 if successful. Return an error code if there is an error.
  */
@@ -615,6 +615,7 @@ RC BTNonLeafNode::readEntry(const int eid, PageId& pid, int& key)
  * output it in pid.
  * @param searchKey[IN] the searchKey that is being looked up.
  * @param pid[OUT] the pointer to the child node to follow.
+ * @param pos[OUT] the key of output pid
  * @return 0 if successful. Return an error code if there is an error.
  */
 RC BTNonLeafNode::locateChildPtr(int searchKey, PageId& pid, int& pos)

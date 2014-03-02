@@ -14,6 +14,8 @@
 #include "Bruinbase.h"
 #include "SqlEngine.h"
 #include "BTreeNode.h"
+#include "BTreeIndex.h"
+//#include "RecordFile.h"
 
 void testRead()
 {
@@ -287,9 +289,18 @@ void testSplit2()
 
 void testNonLeafNode()
 {
-  //testLocate2();
-  //testInsert2();
+  testLocate2();
+  testInsert2();
   testSplit2();
+}
+
+void testReadForward()
+{
+  //RecordFile rf; 
+  //BTreeIndex index; 
+
+  //rf.open('xsmall.tbl', 'r');
+  //index.open('xsmall.idx')
 }
 
 int main()
@@ -299,7 +310,9 @@ int main()
 
   //testLeafNode();
 
-  testNonLeafNode();
+  //testNonLeafNode();
+
+  testReadForward(); 
   
   fprintf(stderr, "All tests passed!\n");
   return 0;
