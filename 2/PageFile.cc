@@ -100,6 +100,7 @@ RC PageFile::seek(PageId pid) const
 
 RC PageFile::write(PageId pid, const void* buffer)
 {
+  //fprintf(stderr, "written pid: %d\n", pid);
   RC rc;
   if (pid < 0) return RC_INVALID_PID; 
 

@@ -346,10 +346,13 @@ int main()
   rid.sid = 1;
   int key;
 
-  rf.open("xsmall.tbl", 'r');
-  index.open("xsmall.idx", 'w');
+ // rf.open("xsmall.tbl", 'r');
+  index.open("test.idx", 'w');
 
   index.insert(8, rid);
+  index.close(); 
+  //index.locate(8, cursor);
+  //fprintf(stderr, "Cursor: pid: %d eid: %d\n", cursor.pid, cursor.eid);
 
   fprintf(stderr, "All tests passed!\n");
   return 0;

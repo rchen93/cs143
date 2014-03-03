@@ -83,6 +83,7 @@ RC BTreeIndex::close()
 // Creates a "root" node for empty tree
 RC BTreeIndex::initTree(const int key, const RecordId& rid)
 {
+	fprintf(stderr, "Inside initTree\n");
 	BTLeafNode *root = new BTLeafNode();
 
 	root->insert(key, rid);
@@ -111,6 +112,7 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
     // new index
     if (treeHeight == 0)
     {
+    	fprintf(stderr, "entering initTree at %d\n", treeHeight);
     	return initTree(key, rid);
     }
 
@@ -123,6 +125,7 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
     // overflow at top level, create new root
     if (siblingKey > 0)
     {
+    	fprintf(stderr, "Creating new root\n");
     	BTNonLeafNode *root = new BTNonLeafNode();
 
     	root->initializeRoot(rootPid, siblingKey, siblingPid);
@@ -156,6 +159,7 @@ RC BTreeIndex::insertHelper(int key, const RecordId& rid, int level, PageId pid,
 		// Overflowed
 		if (leaf->insert(key, rid) != 0)
 		{
+			fprintf(stderr, "Splitting leaves\n");
 			BTLeafNode *siblingLeaf = new BTLeafNode();
 			leaf->insertAndSplit(key, rid, *siblingLeaf, siblingKey);
 
@@ -207,6 +211,7 @@ RC BTreeIndex::insertHelper(int key, const RecordId& rid, int level, PageId pid,
 			// non-leaf overflowed
 			if (nonLeaf->insert(siblingKey, siblingPid) != 0)
 			{
+				fprintf(stderr, "Splitting non-leaves\n");
 				int midKey;
 				BTNonLeafNode *siblingNonLeaf = new BTNonLeafNode();
 
@@ -227,8 +232,10 @@ RC BTreeIndex::insertHelper(int key, const RecordId& rid, int level, PageId pid,
 				delete siblingNonLeaf;
 			}
 			// there was no overflow in non-leaf
-			else
+			else {
+				fprintf(stderr, "No Overflow in non-leaf\n");
 				siblingKey = -1;
+			}
 			
 			nonLeaf->write(pid, pf);
 
@@ -266,10 +273,12 @@ RC BTreeIndex::locate(int searchKey, IndexCursor& cursor)
 	PageId pid = rootPid; 
 	int pos; 
 
+	fprintf(stderr, "Treeheight: %d\n", treeHeight);
 
 	// search through nonleaf nodes for correct pid
 	for (int i = 1; i < treeHeight; i++)
 	{
+		fprintf(stderr, "Treelevel: %d\n", i);
 		nonLeaf->read(pid, pf);
 		fprintf(stderr, "Pid: %d\n", pid);
 		nonLeaf->locateChildPtr(searchKey, pid, pos);
