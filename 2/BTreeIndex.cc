@@ -80,6 +80,23 @@ RC BTreeIndex::close()
     return pf.close();
 }
 
+// Creates a "root" node for empty tree
+RC BTreeIndex::initTree(const int key, const RecordId& rid)
+{
+	BTLeafNode *root = new BTLeafNode();
+
+	root->insert(key, rid);
+	rootPid = pf.endPid();
+	treeHeight = 1;
+	root->write(rootPid, pf);
+
+	fprintf(stderr, "RootPid: %d Pid: %d Sid: %d\n", rootPid, rid.pid, rid.sid);
+	delete root;
+
+	return 0;
+
+}
+
 /*
  * Insert (key, RecordId) pair to the index.
  * @param key[IN] the key for the value inserted into the index
@@ -88,6 +105,34 @@ RC BTreeIndex::close()
  */
 RC BTreeIndex::insert(int key, const RecordId& rid)
 {
+    int siblingKey;
+    PageId siblingPid;
+
+    // new index
+    if (treeHeight == 0)
+    {
+    	return initTree(key, rid);
+    }
+
+    if (insertHelper(key, rid, 1, rootPid, siblingKey, siblingPid) != 0)
+    {
+    	fprintf(stderr, "insertHelper had an error\n");
+    	return RC_FILE_WRITE_FAILED;
+    }
+
+    // overflow at top level, create new root
+    if (siblingKey > 0)
+    {
+    	BTNonLeafNode *root = new BTNonLeafNode();
+
+    	root->initializeRoot(rootPid, siblingKey, siblingPid);
+    	rootPid = pf.endPid();
+    	treeHeight++;
+    	root->write(rootPid, pf);
+
+    	delete root;
+    }
+
     return 0;
 }
 
@@ -98,9 +143,101 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
 	siblingKey: key to insert if there is overflow, otherwise -1
 	siblingPid: PageId to insert if there is overflow, otherwise -1
 */
-RC insertHelper(int key, const RecordId& rid, int level, PageId pid, int& siblingKey, PageId& siblingPid)
+RC BTreeIndex::insertHelper(int key, const RecordId& rid, int level, PageId pid, int& siblingKey, PageId& siblingPid)
 {
+	siblingKey = -1;
 
+	// Base Case: at leaf node
+	if (level == treeHeight)
+	{
+		BTLeafNode *leaf = new BTLeafNode();
+		leaf->read(pid, pf);
+
+		// Overflowed
+		if (leaf->insert(key, rid) != 0)
+		{
+			BTLeafNode *siblingLeaf = new BTLeafNode();
+			leaf->insertAndSplit(key, rid, *siblingLeaf, siblingKey);
+
+			// Adjust PageId pointers
+			siblingPid = pf.endPid();
+			siblingLeaf->setNextNodePtr(leaf->getNextNodePtr());
+			leaf->setNextNodePtr(siblingPid);
+
+			if (siblingLeaf->write(siblingPid, pf) != 0)
+			{
+				fprintf(stderr, "Sibling could not be written!\n");
+
+				delete leaf;
+				delete siblingLeaf;
+
+				return RC_FILE_WRITE_FAILED;
+			}
+
+			delete siblingLeaf;
+		}
+
+		if(leaf->write(pid, pf) != 0)
+		{
+			fprintf(stderr, "Leaf could not be written!\n");
+
+			delete leaf;
+
+			return RC_FILE_WRITE_FAILED;
+		}
+
+		delete leaf;
+
+		return 0;
+	}
+	// At nonleaf node
+	else
+	{
+		BTNonLeafNode *nonLeaf = new BTNonLeafNode();
+		PageId childPid;
+		int pos;
+
+		nonLeaf->read(pid, pf);
+		nonLeaf->locateChildPtr(key, childPid, pos);
+		insertHelper(key, rid, level+1, childPid, siblingKey, siblingPid);
+
+		// child node overflowed
+		if (siblingKey > 0)
+		{
+			// non-leaf overflowed
+			if (nonLeaf->insert(siblingKey, siblingPid) != 0)
+			{
+				int midKey;
+				BTNonLeafNode *siblingNonLeaf = new BTNonLeafNode();
+
+				nonLeaf->insertAndSplit(siblingKey, siblingPid, *siblingNonLeaf, midKey);
+				siblingKey = midKey;
+				siblingPid = pf.endPid();
+
+				if (siblingNonLeaf->write(siblingPid, pf) != 0)
+				{
+					fprintf(stderr, "Sibling could not be written!\n");
+
+					delete nonLeaf;
+					delete siblingNonLeaf;
+
+					return RC_FILE_WRITE_FAILED;
+				}
+
+				delete siblingNonLeaf;
+			}
+			// there was no overflow in non-leaf
+			else
+				siblingKey = -1;
+			
+			nonLeaf->write(pid, pf);
+
+			delete nonLeaf;
+
+			return 0;
+
+		}
+	}
 }
 
 /*
@@ -124,7 +261,7 @@ RC insertHelper(int key, const RecordId& rid, int level, PageId pid, int& siblin
  */
 RC BTreeIndex::locate(int searchKey, IndexCursor& cursor)
 {
-	BTNonLeafNode* nonleaf = new BTNonLeafNode(); 
+	BTNonLeafNode* nonLeaf = new BTNonLeafNode(); 
 	BTLeafNode* leaf = new BTLeafNode(); 
 	PageId pid = rootPid; 
 	int pos; 
@@ -133,9 +270,9 @@ RC BTreeIndex::locate(int searchKey, IndexCursor& cursor)
 	// search through nonleaf nodes for correct pid
 	for (int i = 1; i < treeHeight; i++)
 	{
-		nonleaf->read(pid, pf);
+		nonLeaf->read(pid, pf);
 		fprintf(stderr, "Pid: %d\n", pid);
-		nonleaf->locateChildPtr(searchKey, pid, pos);
+		nonLeaf->locateChildPtr(searchKey, pid, pos);
 		fprintf(stderr, "ChildPid: %d\n", pid);
 	}
 
@@ -149,7 +286,7 @@ RC BTreeIndex::locate(int searchKey, IndexCursor& cursor)
 	RC rc = leaf->locate(searchKey, cursor.eid);
 
 	delete leaf; 
-	delete nonleaf; 
+	delete nonLeaf; 
 
 	if (rc != 0)
 	{

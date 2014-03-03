@@ -15,7 +15,7 @@
 #include "SqlEngine.h"
 #include "BTreeNode.h"
 #include "BTreeIndex.h"
-//#include "RecordFile.h"
+#include "RecordFile.h"
 
 void testRead()
 {
@@ -330,7 +330,7 @@ void testReadForward()
 int main()
 {
   // run the SQL engine taking user commands from standard input (console).
-  // SqlEngine::run(stdin);
+   //SqlEngine::run(stdin);
 
   //testLeafNode();
 
@@ -338,12 +338,18 @@ int main()
 
   //testReadForward(); 
   
+  RecordFile rf;
   BTreeIndex index; 
   IndexCursor cursor;
+  RecordId rid;
+  rid.pid = 0;
+  rid.sid = 1;
+  int key;
 
-  if (index.open("test.idx", 'w') != 0)
-      fprintf(stderr, "Could not open index\n");
-  index.locate(5, cursor);
+  rf.open("xsmall.tbl", 'r');
+  index.open("xsmall.idx", 'w');
+
+  index.insert(8, rid);
 
   fprintf(stderr, "All tests passed!\n");
   return 0;

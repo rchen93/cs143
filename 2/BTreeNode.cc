@@ -11,15 +11,7 @@ struct BTLeafNode::Entry
 
 
 /*
-LeafNode Buffer
-0: KeyCount
-1: key
-2: pid
-3: sid
-4: key
-5: pid
-6: sid
-......n: ptr ->
+NonLeafNode: [ kc | pid | key | pid | ... | pid ]
 */
 
 BTLeafNode::BTLeafNode()
@@ -415,11 +407,10 @@ RC BTNonLeafNode::write(PageId pid, PageFile& pf)
 
  // Returns the maximum number of keys possible for a node
  /*
-    * Unspanned:
     * NonLeafNode: [ kc | pid | key | pid | ... | pid ]
     * 1024/4 = 256 int array
     * 256 - 1 - 1 last pid and keycount
-    * 254/2= 127 pairs of [pid | key] entries
+    * 254/2 = 127 pairs of [key | pid] entries
  */
 
 int BTNonLeafNode::getMaxCount() const
