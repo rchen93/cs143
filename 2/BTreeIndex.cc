@@ -88,6 +88,7 @@ RC BTreeIndex::initTree(const int key, const RecordId& rid)
 
 	root->insert(key, rid);
 	rootPid = pf.endPid();
+	//fprintf(stderr, "rootPid: %d\n", rootPid);
 	treeHeight = 1;
 	root->write(rootPid, pf);
 

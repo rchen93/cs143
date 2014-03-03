@@ -68,6 +68,8 @@ RC BTLeafNode::read(PageId pid, const PageFile& pf)
  */
 RC BTLeafNode::write(PageId pid, PageFile& pf)
 { 
+	for (int i = 0; i < 16; i++)
+		fprintf(stderr, "buffer[%d]: %d ", i, buffer[i]);
 	return pf.write(pid, buffer);
 }
 
@@ -84,7 +86,6 @@ int BTLeafNode::getMaxCount() const
 int BTLeafNode::getKeyCount()
 { 
 	int *intBuffer = (int*) buffer;
-
   	return intBuffer[0]; 
 	/*
 	int numKeys = 0;
@@ -117,11 +118,20 @@ RC BTLeafNode::insert(int key, const RecordId& rid)
 	// Empty Node or Last Entry insertion
 	if (rc != 0)
 	{
+		fprintf(stderr, "New node hereee\n");
+		//for (int i = 0; i < 5; i++)
+		//	fprintf(stderr, "buffer[%d]: %d ", i, buffer[i]);
+
 		eid = getKeyCount();
+		fprintf(stderr, "eid: %d key %d rid.pid: %d rid.sid: %d\n", eid, key, rid.pid, rid.sid);
 		intBuffer[3*eid+1] = key;
 		intBuffer[3*eid+1+1] = rid.pid; 
 		intBuffer[3*eid+1+2] = rid.sid; 
 		updateKeyCount(true); 
+
+		//for (int i = 0; i < 5; i++)
+		//	fprintf(stderr, "intBuffer[%d]: %d ", i, intBuffer[i]);
+
 		return 0; 
 	}
 	else

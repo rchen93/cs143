@@ -34,6 +34,7 @@ PageFile::PageFile(const string& filename, char mode)
 
 RC PageFile::open(const string& filename, char mode)
 {
+  fprintf(stderr, "opening in PageFile\n");
   RC   rc;
   int  oflag;
   struct stat statbuf;
@@ -112,6 +113,7 @@ RC PageFile::write(PageId pid, const void* buffer)
 
   // if the page is in read cache, invalidate it
   for (int i = 0; i < CACHE_COUNT; i++) {
+    //fprintf(stderr, "here\n");
     if (readCache[i].fd == fd && readCache[i].pid == pid &&
         readCache[i].lastAccessed != 0) {
        readCache[i].fd = 0;
