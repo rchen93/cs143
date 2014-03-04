@@ -1,0 +1,18 @@
+opening in PageFile
+Existing: RootPid: -1 Height: 0
+New node created
+eid: 0 key 8 rid.pid: 0 rid.sid: 0
+PreRoot Pid: 0
+RootPid: 1 Pid: 0 Sid: 0
+Key 8 >= searchKey 5
+Eid 0
+Keys before shift: 1 Splitting leaves
+keys: 2
+ReadKey: 8 
+New node created
+eid: 0 key 8 rid.pid: 0 rid.sid: 0
+New node created
+eid: 1 key 5 rid.pid: 0 rid.sid: 1
+Creating new root
+New root created
+All tests passed!

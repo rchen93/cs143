@@ -11,7 +11,7 @@ struct BTLeafNode::Entry
 
 
 /*
-NonLeafNode: [ kc | pid | key | pid | ... | pid ]
+LeafNode: [ kc | key | pid | sid | ... | pid ]
 */
 
 BTLeafNode::BTLeafNode()
@@ -159,31 +159,65 @@ RC BTLeafNode::insert(int key, const RecordId& rid)
  * @return 0 if successful. Return an error code if there is an error.
  */
 
- // TO FIX: INSERTION AFTER SPLIT??
 RC BTLeafNode::insertAndSplit(int key, const RecordId& rid, 
                               BTLeafNode& sibling, int& siblingKey)
 { 
 	double numKeys = (double)(getKeyCount());
 	int numMove = (int)(ceil(numKeys/2));
 	int numStay = getKeyCount() - numMove;
-	int readKey;
+	int read_key;
 	RecordId read_rid;
 	PageId pid;
 
 	RC rc;
 
+	int *intBuffer = (int*) buffer;
+	int first_key = intBuffer[1];
+	RecordId first_rid;
+	first_rid.pid = intBuffer[2];
+	first_rid.sid = intBuffer[3];
+
+	// Put (key,pid,sid) at front of buffer
+	intBuffer[1] = key;
+	intBuffer[2] = rid.pid;
+	intBuffer[3] = rid.sid;
+
+	// Insertion Sort
+	for (int i = 0; i < getKeyCount()-1; i++)
+	{
+		readEntry(i+1, read_key, read_rid);
+
+		// if key we want to insert is larger than the adjacent key, swap them
+		if (read_key < key)
+		{
+			intBuffer[3*(i+1)+1] = key;
+			intBuffer[3*(i+1)+2] = read_rid.pid;
+			intBuffer[3*(i+1)+3] = read_rid.sid;
+			intBuffer[3*i+1] = read_key;
+			intBuffer[3*i+2] = read_rid.pid;
+			intBuffer[3*i+3] = read_rid.sid;
+		}
+		else
+		{
+			//flag = true;
+			break;
+		}
+	}
+
+	// Splitting
 	//fprintf(stderr, "keys: %d\n", getKeyCount());
 	for (int i = (getKeyCount() - 1); i >= numStay; i--)
 	{
 		//fprintf(stderr, "i: %d\n", i);
 		// read entry from original node
-		if (rc = readEntry(i, readKey, read_rid) != 0)
+		if (rc = readEntry(i, read_key, read_rid) != 0)
 		{
 			fprintf(stderr, "Here1\n");
 			return rc;
 		}
+		fprintf(stderr, "ReadKey: %d \n", read_key);
 		// insert into sibling node
-		if (rc = sibling.insert(readKey, read_rid) != 0)
+		if (rc = sibling.insert(read_key, read_rid) != 0)
 		{
 			fprintf(stderr, "Here2\n");
 			return rc;
@@ -196,11 +230,16 @@ RC BTLeafNode::insertAndSplit(int key, const RecordId& rid,
 		}
 	} 
 
+	// Insert first record back into the buffer
+	insert(first_key, first_rid);
+
+	sibling.readEntry(0, siblingKey, read_rid);
+/*
 	sibling.readEntry(0, siblingKey, read_rid);
 	readEntry((getKeyCount()-1), readKey, read_rid);
 
 	// if key is larger than original node, put it new node
-	if (readKey < key)
+	if (readKey <= key)
 	{
 		sibling.insert(key, rid);
 		sibling.readEntry(0, siblingKey, read_rid);
@@ -211,7 +250,7 @@ RC BTLeafNode::insertAndSplit(int key, const RecordId& rid,
 		insert(key, rid);
 		sibling.readEntry(0, siblingKey, read_rid);
 	}
-
+*/
 	return 0;
 }
 
@@ -239,8 +278,9 @@ RC BTLeafNode::locate(int searchKey, int& eid)
 			return rc;
 		if (key >= searchKey)
 		{
-			fprintf(stderr, "Key that is >= %d\n", key);
+			fprintf(stderr, "Key %d >= searchKey %d\n", key, searchKey);
 			eid = i;
+			fprintf(stderr, "Eid %d\n", eid);
 			return 0;
 		}
 	}	
@@ -314,6 +354,7 @@ RC BTLeafNode::shift(const int eid)
 	
 	int *intBuffer = (int*) buffer;
 	// manually shift each element in buffer, in blocks of 3, since each entry has 3 elements
+	//fprintf(stderr, "Keys before shift: %d ", getKeyCount());
 	for (int i = 3*getKeyCount(); i >= 3*eid+1; i--) 
 	{
 		//fprintf(stderr, "%d ", intBuffer[i]);
@@ -526,7 +567,7 @@ RC BTNonLeafNode::insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, in
 		readEntry(i+1, read_pid, read_key);
 
 		// if key we want to insert is larger than the adjacent key, swap them
-		if (read_pid < key)
+		if (read_key < key)
 		{
 			intBuffer[2*(i+1)+2] = key;
 			intBuffer[2*(i+1)+3] = pid;
@@ -583,13 +624,6 @@ RC BTNonLeafNode::insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, in
 		midKey = read_key;
 	}
 	return 0;
-
-	
-	// key we want to insert belongs at end
-	/*else
-	{
-
-	}*/
 }
 
 RC BTNonLeafNode::insertFirstPid(PageId& pid)
@@ -633,7 +667,7 @@ RC BTNonLeafNode::locateChildPtr(int searchKey, PageId& pid, int& pos)
 
     for (int i = 0; i < getKeyCount(); i++)
     {
-        if (intBuffer[2*i+2] >= searchKey)
+        if (intBuffer[2*i+2] > searchKey)
         {
             pid = intBuffer[2*i+2-1];
             pos = 2*i+2;

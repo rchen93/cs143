@@ -293,7 +293,7 @@ RC BTreeIndex::locate(int searchKey, IndexCursor& cursor)
 		fprintf(stderr, "StartingPid: %d ", pid);
 		nonLeaf->locateChildPtr(searchKey, pid, pos);
 		fprintf(stderr, "ChildPid: %d\n", pid);
-		fprintf(stderr, "Pos in array?: %d\n", pos);
+		//fprintf(stderr, "Pos in array?: %d\n", pos);
 	}
 
 	// pid now points to a leaf node
@@ -356,7 +356,7 @@ RC BTreeIndex::readRoot(int searchKey, PageId pid, int& key, PageId& left, PageI
 	else
 	{
 		root->locateChildPtr(searchKey-1, left, pos);
-		root->locateChildPtr(searchKey+1, right, pos);
+		root->locateChildPtr(searchKey, right, pos);
 	}
 	return 0;
 
