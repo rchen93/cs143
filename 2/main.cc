@@ -330,7 +330,7 @@ void testReadForward()
 int main()
 {
   // run the SQL engine taking user commands from standard input (console).
-   //SqlEngine::run(stdin);
+  //SqlEngine::run(stdin);
 
   //testLeafNode();
 
@@ -342,16 +342,57 @@ int main()
   BTreeIndex index; 
   IndexCursor cursor;
   RecordId rid;
-  rid.pid = 0;
-  rid.sid = 1;
   int key;
 
  // rf.open("xsmall.tbl", 'r');
   index.open("test.idx", 'w');
-
-  //index.insert(8, rid);
+  
+  
+  rid.pid = 0;
+  rid.sid = 0;
+  index.insert(8, rid);
   //index.close(); 
-  index.locate(8, cursor);
+  
+
+  
+  rid.pid = 0;
+  rid.sid = 1;
+  index.insert(5, rid);
+  //index.close(); 
+  
+  
+
+  rid.pid = 0;
+  rid.sid = 2;
+  index.insert(1, rid);
+  index.close();
+  
+  //index.locate(8, cursor);
+  //index.locate(5, cursor);
+  //index.locate(1, cursor);
+  //fprintf(stderr, "\n");
+
+  //PageId left;
+  //PageId right;
+  // MEMORY LEAK AT PID=0???
+  //index.readRoot(10, 0, key, left, right);
+  //fprintf(stderr, "Left: %d Right: %d\n", left, right);
+
+  //index.readRoot(10, 3, key, left, right);
+  //fprintf(stderr, "Left: %d Right: %d\n", left, right);
+/*
+  Reading leaf level works
+  int count = 0;
+  while(!index.readForward(cursor, key, rid))
+  {
+    fprintf(stderr, "Key: %d\n", key);
+    fprintf(stderr, "UpdatedCursorPid: %d Eid: %d\n", cursor.pid, cursor.eid);
+    count++;
+  }
+  fprintf(stderr, "Total Keys: %d\n", count);
+*/
+  //index.close(); 
+ 
   //fprintf(stderr, "Cursor: pid: %d eid: %d\n", cursor.pid, cursor.eid);
 
   fprintf(stderr, "All tests passed!\n");

@@ -68,15 +68,17 @@ RC BTLeafNode::read(PageId pid, const PageFile& pf)
  */
 RC BTLeafNode::write(PageId pid, PageFile& pf)
 { 
-	for (int i = 0; i < 16; i++)
-		fprintf(stderr, "buffer[%d]: %d ", i, buffer[i]);
+	//for (int i = 0; i < 16; i++)
+	//	fprintf(stderr, "buffer[%d]: %d ", i, buffer[i]);
+
 	return pf.write(pid, buffer);
 }
 
 // Returns the maximum number of keys possible for a node
 int BTLeafNode::getMaxCount() const
 {
-	return (PageFile::PAGE_SIZE-sizeof(PageId)-sizeof(int))/(sizeof(Entry));
+	return 2;
+	//return (PageFile::PAGE_SIZE-sizeof(PageId)-sizeof(int))/(sizeof(Entry));
 }
 
 /*
@@ -118,7 +120,7 @@ RC BTLeafNode::insert(int key, const RecordId& rid)
 	// Empty Node or Last Entry insertion
 	if (rc != 0)
 	{
-		fprintf(stderr, "New node hereee\n");
+		fprintf(stderr, "New node created\n");
 		//for (int i = 0; i < 5; i++)
 		//	fprintf(stderr, "buffer[%d]: %d ", i, buffer[i]);
 
@@ -237,6 +239,7 @@ RC BTLeafNode::locate(int searchKey, int& eid)
 			return rc;
 		if (key >= searchKey)
 		{
+			fprintf(stderr, "Key that is >= %d\n", key);
 			eid = i;
 			return 0;
 		}
@@ -425,7 +428,8 @@ RC BTNonLeafNode::write(PageId pid, PageFile& pf)
 
 int BTNonLeafNode::getMaxCount() const
 {
-	return (PageFile::PAGE_SIZE-sizeof(PageId)-2*sizeof(int))/(2*sizeof(int));
+	return 2;
+	//return (PageFile::PAGE_SIZE-sizeof(PageId)-2*sizeof(int))/(2*sizeof(int));
 }
 
 
@@ -658,6 +662,8 @@ RC BTNonLeafNode::initializeRoot(PageId pid1, int key, PageId pid2)
     intBuffer[2] = key;
     intBuffer[3] = pid2;
     updateKeyCount(true);
+
+    fprintf(stderr, "New root created\n");
 
     //fprintf(stderr, "Max: %d\n", getMaxCount());
 

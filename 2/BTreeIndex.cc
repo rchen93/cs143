@@ -46,8 +46,11 @@ RC BTreeIndex::open(const string& indexname, char mode)
 		intBuffer[0] = rootPid;
 		intBuffer[1] = treeHeight;
 
+		//fprintf(stderr, "Empty: EndPid: %d RootPid: %d Height: %d\n", pf.endPid(), intBuffer[0], intBuffer[1]);
 		fprintf(stderr, "Empty: RootPid: %d Height: %d\n", intBuffer[0], intBuffer[1]);
 		pf.write(0, buffer);
+
+		//fprintf(stderr, "EndPid: %d\n", pf.endPid());
 	}
 	// Read contents of file
 	else
@@ -75,6 +78,8 @@ RC BTreeIndex::close()
 	intBuffer[0] = rootPid;
 	intBuffer[1] = treeHeight;
 
+	//fprintf(stderr, "What is this: %d %d %d %d %d\n", intBuffer[0], intBuffer[1], intBuffer[2], intBuffer[3], intBuffer[4]);
+
 	pf.write(0, buffer); 
 
     return pf.close();
@@ -83,12 +88,15 @@ RC BTreeIndex::close()
 // Creates a "root" node for empty tree
 RC BTreeIndex::initTree(const int key, const RecordId& rid)
 {
-	fprintf(stderr, "Inside initTree\n");
+	//fprintf(stderr, "Inside initTree\n");
 	BTLeafNode *root = new BTLeafNode();
 
 	root->insert(key, rid);
 	rootPid = pf.endPid();
-	//fprintf(stderr, "rootPid: %d\n", rootPid);
+	
+
+	fprintf(stderr, "PreRoot Pid: %d\n", rid.pid);
+	
 	treeHeight = 1;
 	root->write(rootPid, pf);
 
@@ -113,7 +121,7 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
     // new index
     if (treeHeight == 0)
     {
-    	fprintf(stderr, "entering initTree at %d\n", treeHeight);
+    	//fprintf(stderr, "entering initTree at %d\n", treeHeight);
     	return initTree(key, rid);
     }
 
@@ -137,6 +145,7 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
     	delete root;
     }
 
+    //fprintf(stderr, "TreeHeight: %d", treeHeight);
     return 0;
 }
 
@@ -279,34 +288,78 @@ RC BTreeIndex::locate(int searchKey, IndexCursor& cursor)
 	// search through nonleaf nodes for correct pid
 	for (int i = 1; i < treeHeight; i++)
 	{
-		fprintf(stderr, "Treelevel: %d\n", i);
+		fprintf(stderr, "Treelevel: %d ", i);
 		nonLeaf->read(pid, pf);
-		fprintf(stderr, "Pid: %d\n", pid);
+		fprintf(stderr, "StartingPid: %d ", pid);
 		nonLeaf->locateChildPtr(searchKey, pid, pos);
 		fprintf(stderr, "ChildPid: %d\n", pid);
+		fprintf(stderr, "Pos in array?: %d\n", pos);
 	}
 
 	// pid now points to a leaf node
 	cursor.pid = pid; 
-	fprintf(stderr, "PageId: %d\n", cursor.pid);
+	//fprintf(stderr, "PageId: %d\n", cursor.pid);
 
 	// read the leaf
 	leaf->read(cursor.pid, pf);
 
 	RC rc = leaf->locate(searchKey, cursor.eid);
 
-	delete leaf; 
-	delete nonLeaf; 
-
 	if (rc != 0)
 	{
 		fprintf(stderr, "Not found in this leaf node\n");
-		return rc;
+		cursor.pid = leaf->getNextNodePtr();
+		fprintf(stderr, "New Cursor.pid: %d\n", cursor.pid);
+
+		if (pid == -1)
+		{
+			fprintf(stderr, "Key does not exist\n");
+			delete leaf; 
+			delete nonLeaf; 
+			return RC_NO_SUCH_RECORD;
+		}
+		else
+		{
+			fprintf(stderr, "Moving to next\n");
+			leaf->read(cursor.pid, pf);
+			leaf->locate(searchKey, cursor.eid);
+		}
 	} 
+
+	delete leaf; 
+	delete nonLeaf; 
 
 	fprintf(stderr, "EntryId: %d\n", cursor.eid);
 
     return 0;
+}
+
+/*
+	Read the root specified at pid
+	@param searchKey[IN] the specific key to search for in root
+	@param pid[IN] the pid at which root is located at
+	@param key[OUT] the key stored at root
+	@param[OUT] the left child pointer of key
+	@param[OUT] the right child pointer of key
+*/
+RC BTreeIndex::readRoot(int searchKey, PageId pid, int& key, PageId& left, PageId& right)
+{
+	BTNonLeafNode *root = new BTNonLeafNode();
+	int pos;
+
+	RC rc = root->read(pid, pf);
+	if (rc != 0)
+	{
+		fprintf(stderr, "could not be read\n");
+		return RC_FILE_READ_FAILED;
+	}
+	else
+	{
+		root->locateChildPtr(searchKey-1, left, pos);
+		root->locateChildPtr(searchKey+1, right, pos);
+	}
+	return 0;
+
 }
 
 /*
@@ -319,8 +372,8 @@ RC BTreeIndex::locate(int searchKey, IndexCursor& cursor)
  */
 RC BTreeIndex::readForward(IndexCursor& cursor, int& key, RecordId& rid)
 {
-   BTLeafNode *leaf = new BTLeafNode();
-	//BTLeafNode* leaf;  
+
+   BTLeafNode *leaf = new BTLeafNode(); 
    
    leaf -> read(cursor.pid, pf);
    RC rc = leaf -> readEntry(cursor.eid, key, rid);
@@ -340,7 +393,7 @@ RC BTreeIndex::readForward(IndexCursor& cursor, int& key, RecordId& rid)
    }
    else
        cursor.eid++;
-   fprintf(stderr, "Updated Eid; %d\n", cursor.eid);
+   //fprintf(stderr, "Updated Eid; %d\n", cursor.eid);
    delete leaf;
    return 0;
 }

@@ -93,6 +93,8 @@ class BTreeIndex {
   RC insertHelper(int key, const RecordId& rid, int level, PageId pid, int& siblingKey, PageId& siblingPid);
 
   RC initTree(const int key, const RecordId& rid);
+
+  RC readRoot(int searchKey, PageId pid, int& key, PageId& left, PageId& right);
   
  private:
   PageFile pf;         /// the PageFile used to store the actual b+tree in disk
