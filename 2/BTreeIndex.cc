@@ -47,7 +47,6 @@ RC BTreeIndex::open(const string& indexname, char mode)
 		intBuffer[1] = treeHeight;
 
 		//fprintf(stderr, "Empty: EndPid: %d RootPid: %d Height: %d\n", pf.endPid(), intBuffer[0], intBuffer[1]);
-		//fprintf(stderr, "Empty: RootPid: %d Height: %d\n", intBuffer[0], intBuffer[1]);
 		pf.write(0, buffer);
 
 		//fprintf(stderr, "EndPid: %d\n", pf.endPid());
@@ -85,7 +84,12 @@ RC BTreeIndex::close()
     return pf.close();
 }
 
-// Creates a "root" node for empty tree
+/**
+* Creates a leaf node with (key, rid) in an empty index
+* @param key[IN] the key to be inserted
+* @param rid[IN] the RecordId to be inserted
+* @return error code. 0 if no error
+*/
 RC BTreeIndex::initTree(const int key, const RecordId& rid)
 {
 	//fprintf(stderr, "Inside initTree\n");
@@ -149,12 +153,15 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
     return 0;
 }
 
-/*
-	Helper for insert
-	level: level we are searching the B+ tree on
-	pid: PageId of the node we are currently on
-	siblingKey: key to insert if there is overflow, otherwise -1
-	siblingPid: PageId to insert if there is overflow, otherwise -1
+/**
+* Helper function for insert
+* @param key[IN] the key for the value inserted into the index
+* @param rid[IN] the RecordId for the record being inserted into the index
+* @param level[IN] the tree level we are currently searching at
+* @param pid[IN] the PageId of the node we are currently looking at
+* @param siblingKey[OUT] the key that results from overflow. if no overflow, siblingKey = -1
+* @param siblingPid[OUT] the PageId for the sibling node. if no overflow, siblingPid = -1
+* @return error code. 0 if no error
 */
 RC BTreeIndex::insertHelper(int key, const RecordId& rid, int level, PageId pid, int& siblingKey, PageId& siblingPid)
 {
@@ -348,15 +355,15 @@ RC BTreeIndex::locate(int searchKey, IndexCursor& cursor)
     return 0;
 }
 
-/*
-	Read the root specified at pid
-	@param searchKey[IN] the specific key to search for in root
-	@param pid[IN] the pid at which root is located at
-	@param key[OUT] the key stored at root
-	@param[OUT] the left child pointer of key
-	@param[OUT] the right child pointer of key
+/**
+* Reads the entry in a nonleaf node specified by its searchKey and pid
+* @param searchKey[IN] the key we want to look at in the nonleaf node
+* @param pid[IN] the corresponding pid for the nonleaf node
+* @param left[OUT] the left child pid for the key (x < key)
+* @param right[OUT] the right child pid for the key (key <= x)
+* @return error code. 0 if no error
 */
-RC BTreeIndex::readRoot(int searchKey, PageId pid, int& key, PageId& left, PageId& right)
+RC BTreeIndex::readRoot(int searchKey, PageId pid, PageId& left, PageId& right)
 {
 	BTNonLeafNode *root = new BTNonLeafNode();
 	int pos;

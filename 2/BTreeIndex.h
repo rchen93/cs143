@@ -90,11 +90,35 @@ class BTreeIndex {
    */
   RC readForward(IndexCursor& cursor, int& key, RecordId& rid);
 
+   /**
+   * Helper function for insert
+   * @param key[IN] the key for the value inserted into the index
+   * @param rid[IN] the RecordId for the record being inserted into the index
+   * @param level[IN] the tree level we are currently searching at
+   * @param pid[IN] the PageId of the node we are currently looking at
+   * @param siblingKey[OUT] the key that results from overflow. if no overflow, siblingKey = -1
+   * @param siblingPid[OUT] the PageId for the sibling node. if no overflow, siblingPid = -1
+   * @return error code. 0 if no error
+   */
   RC insertHelper(int key, const RecordId& rid, int level, PageId pid, int& siblingKey, PageId& siblingPid);
 
+   /**
+   * Creates a leaf node with (key, rid) in an empty index
+   * @param key[IN] the key to be inserted
+   * @param rid[IN] the RecordId to be inserted
+   * @return error code. 0 if no error
+   */
   RC initTree(const int key, const RecordId& rid);
 
-  RC readRoot(int searchKey, PageId pid, int& key, PageId& left, PageId& right);
+  /**
+   * Reads the entry in a nonleaf node specified by its searchKey and pid
+   * @param searchKey[IN] the key we want to look at in the nonleaf node
+   * @param pid[IN] the corresponding pid for the nonleaf node
+   * @param left[OUT] the left child pid for the key (x < key)
+   * @param right[OUT] the right child pid for the key (key <= x)
+   * @return error code. 0 if no error
+   */
+  RC readRoot(int searchKey, PageId pid, PageId& left, PageId& right);
   
  private:
   PageFile pf;         /// the PageFile used to store the actual b+tree in disk

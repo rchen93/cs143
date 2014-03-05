@@ -320,7 +320,7 @@ void testIndex()
   index.insert(1, rid);
 
   fprintf(stderr, "LeafOverflow->NewRoot\n");
-  index.readRoot(8, 3, key, left, right);
+  index.readRoot(8, 3, left, right);
   fprintf(stderr, "Key: 8 rootPid: 3 Left: %d Right: %d\n", left, right);   // Left: 1 Right: 2
 
   rid.pid = 0;
@@ -328,9 +328,9 @@ void testIndex()
   index.insert(7, rid);
 
   fprintf(stderr, "UpdateRoot\n");
-  index.readRoot(7, 3, key, left, right);
+  index.readRoot(7, 3, left, right);
   fprintf(stderr, "Key: 7 rootPid: 3 Left: %d Right: %d\n", left, right);   // Left: 1 Right: 4
-  index.readRoot(8, 3, key, left, right);
+  index.readRoot(8, 3, left, right);
   fprintf(stderr, "Key: 8 rootPid: 3 Left: %d Right: %d\n", left, right);   // Left: 4 Right: 2
 
   rid.pid = 0;
@@ -338,11 +338,11 @@ void testIndex()
   index.insert(3, rid);
 
   fprintf(stderr, "LeafOverflow->NonLeafOverflow->NewRoot\n");
-  index.readRoot(7, 7, key, left, right);
+  index.readRoot(7, 7, left, right);
   fprintf(stderr, "Key: 7 rootPid: 7 Left: %d Right: %d\n", left, right);   // Left: 3 Right: 6
-  index.readRoot(5, 3, key, left, right);
+  index.readRoot(5, 3, left, right);
   fprintf(stderr, "Key: 5 rootPid: 3 Left: %d Right: %d\n", left, right);   // Left: 1 Right: 5
-  index.readRoot(8, 6, key, left, right);
+  index.readRoot(8, 6, left, right);
   fprintf(stderr, "Key: 8 rootPid: 6 Left: %d Right: %d\n", left, right);   // Left: 4 Right: 2
 
   rid.pid = 0;
@@ -354,13 +354,13 @@ void testIndex()
   index.insert(9, rid);
 
   fprintf(stderr, "LeafOverflow\n");
-  index.readRoot(7, 7, key, left, right);
+  index.readRoot(7, 7, left, right);
   fprintf(stderr, "Key: 7 rootPid: 7 Left: %d Right: %d\n", left, right);   // Left: 3 Right: 6
-  index.readRoot(5, 3, key, left, right);
+  index.readRoot(5, 3, left, right);
   fprintf(stderr, "Key: 5 rootPid: 3 Left: %d Right: %d\n", left, right);   // Left: 1 Right: 5
-  index.readRoot(8, 6, key, left, right);
+  index.readRoot(8, 6, left, right);
   fprintf(stderr, "Key: 8 rootPid: 6 Left: %d Right: %d\n", left, right);   // Left: 4 Right: 2
-  index.readRoot(12, 6, key, left, right);
+  index.readRoot(12, 6, left, right);
   fprintf(stderr, "Key: 12 rootPid: 6 Left: %d Right: %d\n", left, right);   // Left: 2 Right: 8
 
   rid.pid = 0;
