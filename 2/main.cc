@@ -347,26 +347,33 @@ int main()
  // rf.open("xsmall.tbl", 'r');
   index.open("test.idx", 'w');
   
-  /*
+  
   rid.pid = 0;
   rid.sid = 0;
-  index.insert(8, rid);
+  index.insert(1, rid);
   
   rid.pid = 0;
   rid.sid = 1;
-  index.insert(5, rid);
+  index.insert(4, rid);
 
   rid.pid = 0;
   rid.sid = 2;
-  index.insert(1, rid);
-  index.close();
-*/
-  /*
+  index.insert(9, rid);
+  //index.close();
+
+  
   rid.pid = 0;
   rid.sid = 3;
-  index.insert(7, rid);
-  index.close();
-  */
+  index.insert(16, rid);
+  //index.close();
+  
+  
+  rid.pid = 0;
+  rid.sid = 4;
+  index.insert(25, rid);
+  
+  
+
 
   /*
   index.locate(8, cursor);
@@ -375,15 +382,27 @@ int main()
   //fprintf(stderr, "\n");
   */
 
-  
+   
   PageId left;
   PageId right;
-  
+  index.readRoot(9, 3, key, left, right);
+  fprintf(stderr, "Left: %d Right: %d\n", left, right);
+
+/*
   index.readRoot(7, 3, key, left, right);
   fprintf(stderr, "Left: %d Right: %d\n", left, right);
   index.readRoot(8, 3, key, left, right);
   fprintf(stderr, "Left: %d Right: %d\n", left, right);
-  
+*/
+
+
+  //index.readRoot(7, 7, key, left, right);
+  //fprintf(stderr, "Left: %d Right: %d\n", left, right);
+  //index.readRoot(5, 3, key, left, right);
+  //fprintf(stderr, "Left: %d Right: %d\n", left, right);
+  //index.readRoot(8, 6, key, left, right);
+  //fprintf(stderr, "Left: %d Right: %d\n", left, right);
+
   int count = 0;
   cursor.pid = 1;
   cursor.eid = 0;
@@ -395,6 +414,7 @@ int main()
     count++;
   }
   fprintf(stderr, "Total Keys: %d\n", count);
+  
 
   index.close(); 
   

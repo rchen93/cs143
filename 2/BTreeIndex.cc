@@ -164,7 +164,13 @@ RC BTreeIndex::insertHelper(int key, const RecordId& rid, int level, PageId pid,
 	if (level == treeHeight)
 	{
 		BTLeafNode *leaf = new BTLeafNode();
-		leaf->read(pid, pf);
+
+		if (leaf->read(pid, pf) != 0)
+		{
+			fprintf(stderr, "Leaf could not be read!\n");
+			delete leaf;
+			return RC_FILE_READ_FAILED;
+		}
 
 		// Overflowed
 		if (leaf->insert(key, rid) != 0)
@@ -212,8 +218,13 @@ RC BTreeIndex::insertHelper(int key, const RecordId& rid, int level, PageId pid,
 		int pos;
 
 		nonLeaf->read(pid, pf);
-		nonLeaf->locateChildPtr(key, childPid, pos);
+		if (nonLeaf->locateChildPtr(key, childPid, pos) != 0)
+		{
+			fprintf(stderr, "Could not find child\n");
+			return RC_NO_SUCH_RECORD;
+		}
 		insertHelper(key, rid, level+1, childPid, siblingKey, siblingPid);
+		fprintf(stderr, "insertHelper - SiblingKey: %d\n", siblingKey);
 
 		// child node overflowed
 		if (siblingKey > 0)
@@ -224,6 +235,8 @@ RC BTreeIndex::insertHelper(int key, const RecordId& rid, int level, PageId pid,
 				fprintf(stderr, "Splitting non-leaves\n");
 				int midKey;
 				BTNonLeafNode *siblingNonLeaf = new BTNonLeafNode();
+
+				fprintf(stderr, "siblingKey: %d siblingPid: %d\n", siblingKey, siblingPid);
 
 				nonLeaf->insertAndSplit(siblingKey, siblingPid, *siblingNonLeaf, midKey);
 				siblingKey = midKey;
@@ -254,6 +267,7 @@ RC BTreeIndex::insertHelper(int key, const RecordId& rid, int level, PageId pid,
 			return 0;
 
 		}
+		return 0;
 	}
 }
 
