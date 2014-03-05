@@ -12,6 +12,7 @@ struct BTLeafNode::Entry
 
 /*
 LeafNode: [ kc | key | pid | sid | ... | pid ]
+(key, RecordId) tuples
 */
 
 BTLeafNode::BTLeafNode()
@@ -77,8 +78,8 @@ RC BTLeafNode::write(PageId pid, PageFile& pf)
 // Returns the maximum number of keys possible for a node
 int BTLeafNode::getMaxCount() const
 {
-	return 3;
-	//return (PageFile::PAGE_SIZE-sizeof(PageId)-sizeof(int))/(sizeof(Entry));
+	//return 2;
+	return (PageFile::PAGE_SIZE-sizeof(PageId)-sizeof(int))/(sizeof(Entry));
 }
 
 /*
@@ -109,7 +110,7 @@ RC BTLeafNode::insert(int key, const RecordId& rid)
 { 
 	if (getKeyCount() >= getMaxCount())
 	{
-		fprintf(stderr, "Leafnode full\n");
+		//fprintf(stderr, "Leafnode full\n");
 		return RC_NODE_FULL;
 	}
 
@@ -123,12 +124,12 @@ RC BTLeafNode::insert(int key, const RecordId& rid)
 	// Empty Node or Last Entry insertion
 	if (rc != 0)
 	{
-		fprintf(stderr, "New node created\n");
+		//fprintf(stderr, "New node created\n");
 		//for (int i = 0; i < 5; i++)
 		//	fprintf(stderr, "buffer[%d]: %d ", i, buffer[i]);
 
 		eid = getKeyCount();
-		fprintf(stderr, "eid: %d key %d rid.pid: %d rid.sid: %d\n", eid, key, rid.pid, rid.sid);
+		//fprintf(stderr, "eid: %d key %d rid.pid: %d rid.sid: %d\n", eid, key, rid.pid, rid.sid);
 		intBuffer[3*eid+1] = key;
 		intBuffer[3*eid+1+1] = rid.pid; 
 		intBuffer[3*eid+1+2] = rid.sid; 
@@ -201,34 +202,25 @@ RC BTLeafNode::insertAndSplit(int key, const RecordId& rid,
 			intBuffer[3*i+3] = read_rid.sid;
 		}
 		else
-		{
-			//flag = true;
 			break;
-		}
 	}
 
 	// Splitting
-	//fprintf(stderr, "keys: %d\n", getKeyCount());
 	for (int i = (getKeyCount() - 1); i >= numStay; i--)
 	{
-		//fprintf(stderr, "i: %d\n", i);
 		// read entry from original node
 		if (rc = readEntry(i, read_key, read_rid) != 0)
 		{
-			fprintf(stderr, "Here1\n");
 			return rc;
 		}
-		fprintf(stderr, "ReadKey: %d \n", read_key);
 		// insert into sibling node
 		if (rc = sibling.insert(read_key, read_rid) != 0)
 		{
-			fprintf(stderr, "Here2\n");
 			return rc;
 		}
 		// delete entry from original buffer
 		if (rc = deleteEntry(i) != 0)
 		{
-			fprintf(stderr, "Here3\n");
 			return rc;
 		}
 	} 
@@ -264,14 +256,14 @@ RC BTLeafNode::locate(int searchKey, int& eid)
 			return rc;
 		if (key >= searchKey)
 		{
-			fprintf(stderr, "Key %d >= searchKey %d\n", key, searchKey);
+			//fprintf(stderr, "Key %d >= searchKey %d\n", key, searchKey);
 			eid = i;
-			fprintf(stderr, "Eid %d\n", eid);
+			//fprintf(stderr, "Eid %d\n", eid);
 			return 0;
 		}
 	}	
 	
-	fprintf(stderr, "Locate: no record\n");
+	//fprintf(stderr, "Locate: no record\n");
 	return RC_NO_SUCH_RECORD; 
 }
 
@@ -456,8 +448,8 @@ RC BTNonLeafNode::write(PageId pid, PageFile& pf)
 
 int BTNonLeafNode::getMaxCount() const
 {
-	return 3;
-	//return (PageFile::PAGE_SIZE-sizeof(PageId)-2*sizeof(int))/(2*sizeof(int));
+	//return 2;
+	return (PageFile::PAGE_SIZE-sizeof(PageId)-2*sizeof(int))/(2*sizeof(int));
 }
 
 
@@ -483,7 +475,7 @@ RC BTNonLeafNode::insert(int key, PageId pid)
 { 
     if (getKeyCount() >= getMaxCount())
     {
-    	fprintf(stderr, "Node full\n");
+    	//fprintf(stderr, "Node full\n");
         return RC_NODE_FULL;
     }
 
@@ -539,7 +531,6 @@ RC BTNonLeafNode::insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, in
 	int numStay = getKeyCount() - numMove;
 
 	PageId temp_pid;
-	PageId temp_pos;
 
 	int *intBuffer = (int*) buffer;
 
@@ -548,12 +539,11 @@ RC BTNonLeafNode::insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, in
 	int first_pid = intBuffer[3];
 	PageId beginning_pid;
 
-	int insertKeyPos;
 	int temp_key;
 
 	// Save the pid for the sibling's first pid
 	readEntry(numStay-1, temp_pid, temp_key);
-	fprintf(stderr, "Temp_pid: %d\n", temp_pid);
+	//fprintf(stderr, "Temp_pid: %d\n", temp_pid);
 
 	// Put (key,pid) at front of buffer
 	intBuffer[2] = key;
@@ -589,28 +579,25 @@ RC BTNonLeafNode::insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, in
 		// read entry from original node
 		if (rc = readEntry(i, read_pid, read_key) != 0)
 		{
-			fprintf(stderr, "Here1\n");
+			//fprintf(stderr, "Here1\n");
 			return rc;
 		}
 		// insert into sibling node
 		if (rc = sibling.insert(read_key, read_pid) != 0)
 		{
-			fprintf(stderr, "Here2\n");
+			//fprintf(stderr, "Here2\n");
 			return rc;
 		}
 		// delete entry from original buffer
 		if (rc = deleteEntry(i) != 0)
 		{
-			fprintf(stderr, "Here3\n");
+			//fprintf(stderr, "Here3\n");
 			return rc;
 		}
 	} 
 
 	// insert first key back into original buffer
 	insert(first_key, first_pid);
-
-	//locateExact(first_key, temp_pid, temp_pos);
-
 
 	// its the pid of the entry to the left of the split
 	beginning_pid = temp_pid;
@@ -704,7 +691,7 @@ RC BTNonLeafNode::initializeRoot(PageId pid1, int key, PageId pid2)
     intBuffer[3] = pid2;
     updateKeyCount(true);
 
-    fprintf(stderr, "New root created\n");
+    //fprintf(stderr, "New root created\n");
 
     //fprintf(stderr, "Max: %d\n", getMaxCount());
 

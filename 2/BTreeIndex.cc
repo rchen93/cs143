@@ -47,7 +47,7 @@ RC BTreeIndex::open(const string& indexname, char mode)
 		intBuffer[1] = treeHeight;
 
 		//fprintf(stderr, "Empty: EndPid: %d RootPid: %d Height: %d\n", pf.endPid(), intBuffer[0], intBuffer[1]);
-		fprintf(stderr, "Empty: RootPid: %d Height: %d\n", intBuffer[0], intBuffer[1]);
+		//fprintf(stderr, "Empty: RootPid: %d Height: %d\n", intBuffer[0], intBuffer[1]);
 		pf.write(0, buffer);
 
 		//fprintf(stderr, "EndPid: %d\n", pf.endPid());
@@ -61,7 +61,7 @@ RC BTreeIndex::open(const string& indexname, char mode)
 		rootPid = intBuffer[0];
 		treeHeight = intBuffer[1];
 
-		fprintf(stderr, "Existing: RootPid: %d Height: %d\n", rootPid, treeHeight);
+		//fprintf(stderr, "Existing: RootPid: %d Height: %d\n", rootPid, treeHeight);
 	}
 
     return 0;
@@ -95,12 +95,12 @@ RC BTreeIndex::initTree(const int key, const RecordId& rid)
 	rootPid = pf.endPid();
 	
 
-	fprintf(stderr, "PreRoot Pid: %d\n", rid.pid);
+	//fprintf(stderr, "PreRoot Pid: %d\n", rid.pid);
 	
 	treeHeight = 1;
 	root->write(rootPid, pf);
 
-	fprintf(stderr, "RootPid: %d Pid: %d Sid: %d\n", rootPid, rid.pid, rid.sid);
+	//fprintf(stderr, "RootPid: %d Pid: %d Sid: %d\n", rootPid, rid.pid, rid.sid);
 	delete root;
 
 	return 0;
@@ -127,14 +127,14 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
 
     if (insertHelper(key, rid, 1, rootPid, siblingKey, siblingPid) != 0)
     {
-    	fprintf(stderr, "insertHelper had an error\n");
+    	//fprintf(stderr, "insertHelper had an error\n");
     	return RC_FILE_WRITE_FAILED;
     }
 
     // overflow at top level, create new root
     if (siblingKey > 0)
     {
-    	fprintf(stderr, "Creating new root\n");
+    	//fprintf(stderr, "Creating new root\n");
     	BTNonLeafNode *root = new BTNonLeafNode();
 
     	root->initializeRoot(rootPid, siblingKey, siblingPid);
@@ -167,7 +167,7 @@ RC BTreeIndex::insertHelper(int key, const RecordId& rid, int level, PageId pid,
 
 		if (leaf->read(pid, pf) != 0)
 		{
-			fprintf(stderr, "Leaf could not be read!\n");
+			//fprintf(stderr, "Leaf could not be read!\n");
 			delete leaf;
 			return RC_FILE_READ_FAILED;
 		}
@@ -175,7 +175,7 @@ RC BTreeIndex::insertHelper(int key, const RecordId& rid, int level, PageId pid,
 		// Overflowed
 		if (leaf->insert(key, rid) != 0)
 		{
-			fprintf(stderr, "Splitting leaves\n");
+			//fprintf(stderr, "Splitting leaves\n");
 			BTLeafNode *siblingLeaf = new BTLeafNode();
 			leaf->insertAndSplit(key, rid, *siblingLeaf, siblingKey);
 
@@ -186,7 +186,7 @@ RC BTreeIndex::insertHelper(int key, const RecordId& rid, int level, PageId pid,
 
 			if (siblingLeaf->write(siblingPid, pf) != 0)
 			{
-				fprintf(stderr, "Sibling could not be written!\n");
+				//fprintf(stderr, "Sibling could not be written!\n");
 
 				delete leaf;
 				delete siblingLeaf;
@@ -199,7 +199,7 @@ RC BTreeIndex::insertHelper(int key, const RecordId& rid, int level, PageId pid,
 
 		if(leaf->write(pid, pf) != 0)
 		{
-			fprintf(stderr, "Leaf could not be written!\n");
+			//fprintf(stderr, "Leaf could not be written!\n");
 
 			delete leaf;
 
@@ -220,11 +220,11 @@ RC BTreeIndex::insertHelper(int key, const RecordId& rid, int level, PageId pid,
 		nonLeaf->read(pid, pf);
 		if (nonLeaf->locateChildPtr(key, childPid, pos) != 0)
 		{
-			fprintf(stderr, "Could not find child\n");
+			//fprintf(stderr, "Could not find child\n");
 			return RC_NO_SUCH_RECORD;
 		}
 		insertHelper(key, rid, level+1, childPid, siblingKey, siblingPid);
-		fprintf(stderr, "insertHelper - SiblingKey: %d\n", siblingKey);
+		//fprintf(stderr, "insertHelper - SiblingKey: %d\n", siblingKey);
 
 		// child node overflowed
 		if (siblingKey > 0)
@@ -232,11 +232,11 @@ RC BTreeIndex::insertHelper(int key, const RecordId& rid, int level, PageId pid,
 			// non-leaf overflowed
 			if (nonLeaf->insert(siblingKey, siblingPid) != 0)
 			{
-				fprintf(stderr, "Splitting non-leaves\n");
+				//fprintf(stderr, "Splitting non-leaves\n");
 				int midKey;
 				BTNonLeafNode *siblingNonLeaf = new BTNonLeafNode();
 
-				fprintf(stderr, "siblingKey: %d siblingPid: %d\n", siblingKey, siblingPid);
+				//fprintf(stderr, "siblingKey: %d siblingPid: %d\n", siblingKey, siblingPid);
 
 				nonLeaf->insertAndSplit(siblingKey, siblingPid, *siblingNonLeaf, midKey);
 				siblingKey = midKey;
@@ -244,7 +244,7 @@ RC BTreeIndex::insertHelper(int key, const RecordId& rid, int level, PageId pid,
 
 				if (siblingNonLeaf->write(siblingPid, pf) != 0)
 				{
-					fprintf(stderr, "Sibling could not be written!\n");
+					//fprintf(stderr, "Sibling could not be written!\n");
 
 					delete nonLeaf;
 					delete siblingNonLeaf;
@@ -256,7 +256,7 @@ RC BTreeIndex::insertHelper(int key, const RecordId& rid, int level, PageId pid,
 			}
 			// there was no overflow in non-leaf
 			else {
-				fprintf(stderr, "No Overflow in non-leaf\n");
+				//fprintf(stderr, "No Overflow in non-leaf\n");
 				siblingKey = -1;
 			}
 			
@@ -297,16 +297,16 @@ RC BTreeIndex::locate(int searchKey, IndexCursor& cursor)
 	PageId pid = rootPid; 
 	int pos; 
 
-	fprintf(stderr, "Treeheight: %d\n", treeHeight);
+	//fprintf(stderr, "Treeheight: %d\n", treeHeight);
 
 	// search through nonleaf nodes for correct pid
 	for (int i = 1; i < treeHeight; i++)
 	{
-		fprintf(stderr, "Treelevel: %d ", i);
+		//fprintf(stderr, "Treelevel: %d ", i);
 		nonLeaf->read(pid, pf);
-		fprintf(stderr, "StartingPid: %d ", pid);
+		//fprintf(stderr, "StartingPid: %d ", pid);
 		nonLeaf->locateChildPtr(searchKey, pid, pos);
-		fprintf(stderr, "ChildPid: %d\n", pid);
+		//fprintf(stderr, "ChildPid: %d\n", pid);
 		//fprintf(stderr, "Pos in array?: %d\n", pos);
 	}
 
@@ -321,20 +321,20 @@ RC BTreeIndex::locate(int searchKey, IndexCursor& cursor)
 
 	if (rc != 0)
 	{
-		fprintf(stderr, "Not found in this leaf node\n");
+		//fprintf(stderr, "Not found in this leaf node\n");
 		cursor.pid = leaf->getNextNodePtr();
-		fprintf(stderr, "New Cursor.pid: %d\n", cursor.pid);
+		//fprintf(stderr, "New Cursor.pid: %d\n", cursor.pid);
 
 		if (pid == -1)
 		{
-			fprintf(stderr, "Key does not exist\n");
+		//	fprintf(stderr, "Key does not exist\n");
 			delete leaf; 
 			delete nonLeaf; 
 			return RC_NO_SUCH_RECORD;
 		}
 		else
 		{
-			fprintf(stderr, "Moving to next\n");
+		//	fprintf(stderr, "Moving to next\n");
 			leaf->read(cursor.pid, pf);
 			leaf->locate(searchKey, cursor.eid);
 		}
@@ -343,7 +343,7 @@ RC BTreeIndex::locate(int searchKey, IndexCursor& cursor)
 	delete leaf; 
 	delete nonLeaf; 
 
-	fprintf(stderr, "EntryId: %d\n", cursor.eid);
+	//fprintf(stderr, "EntryId: %d\n", cursor.eid);
 
     return 0;
 }
@@ -364,7 +364,7 @@ RC BTreeIndex::readRoot(int searchKey, PageId pid, int& key, PageId& left, PageI
 	RC rc = root->read(pid, pf);
 	if (rc != 0)
 	{
-		fprintf(stderr, "could not be read\n");
+		//fprintf(stderr, "could not be read\n");
 		return RC_FILE_READ_FAILED;
 	}
 	else
@@ -393,15 +393,15 @@ RC BTreeIndex::readForward(IndexCursor& cursor, int& key, RecordId& rid)
    RC rc = leaf -> readEntry(cursor.eid, key, rid);
    if (rc != 0)
    {
-   	   fprintf(stderr, "Entry does not exist\n");
+   	   //fprintf(stderr, "Entry does not exist\n");
    	   delete leaf;
        return rc;
    }   
-   fprintf(stderr, "Eid: %d Key: %d Rid: %d\n", cursor.eid, key, rid);
+   //fprintf(stderr, "Eid: %d Key: %d Rid: %d\n", cursor.eid, key, rid);
    // last entry in node
    if (cursor.eid == (leaf -> getKeyCount() - 1))
    {
-   	   fprintf(stderr, "Moving to next sibling leaf\n");
+   	   //fprintf(stderr, "Moving to next sibling leaf\n");
        cursor.pid = leaf -> getNextNodePtr();
        cursor.eid = 0;
    }

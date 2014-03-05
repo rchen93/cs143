@@ -190,9 +190,9 @@ void testSplit()
 // Tests LeafNode functions
 void testLeafNode()
 {
-  //testRead();
-  //testLocate();
-  //testInsert();
+  testRead();
+  testLocate();
+  testInsert();
   testSplit();
 }
 
@@ -289,43 +289,99 @@ void testSplit2()
 
 void testNonLeafNode()
 {
-  //testLocate2();
-  //testInsert2();
+  testLocate2();
+  testInsert2();
   testSplit2();
 }
 
-/*
-void testReadForward()
+// Make sure getMaxCount() returns 2 
+void testIndex()
 {
-  RecordFile rf; 
-  BTreeIndex index; 
+  RecordFile rf;
+  BTreeIndex index;
   IndexCursor cursor;
-
-  int key;
-  string value;
   RecordId rid;
-  int count;
+  int key;
+  PageId left;
+  PageId right;
 
-  if (rf.open('xsmall.tbl', 'r') != 0)
-      fprintf(stderr, "Could not open record file\n");
-  if (index.open('xsmall.idx', 'w') != 0)
-      fprintf(stderr, "Could not open index\n");
-  if (index.locate(0, cursor) != 0)
-      fprintf(stderr, "Could not locate cursor\n");
+  index.open("test.idx", 'w');
+  
+  rid.pid = 0;
+  rid.sid = 0;
+  index.insert(8, rid);
 
-  count = 0;
+  rid.pid = 0;
+  rid.sid = 1;
+  index.insert(5, rid);
 
-  while (!index.readForward(cursor, key, rid))
+  rid.pid = 0;
+  rid.sid = 2;
+  index.insert(1, rid);
+
+  fprintf(stderr, "LeafOverflow->NewRoot\n");
+  index.readRoot(8, 3, key, left, right);
+  fprintf(stderr, "Key: 8 rootPid: 3 Left: %d Right: %d\n", left, right);   // Left: 1 Right: 2
+
+  rid.pid = 0;
+  rid.sid = 3;
+  index.insert(7, rid);
+
+  fprintf(stderr, "UpdateRoot\n");
+  index.readRoot(7, 3, key, left, right);
+  fprintf(stderr, "Key: 7 rootPid: 3 Left: %d Right: %d\n", left, right);   // Left: 1 Right: 4
+  index.readRoot(8, 3, key, left, right);
+  fprintf(stderr, "Key: 8 rootPid: 3 Left: %d Right: %d\n", left, right);   // Left: 4 Right: 2
+
+  rid.pid = 0;
+  rid.sid = 4;
+  index.insert(3, rid);
+
+  fprintf(stderr, "LeafOverflow->NonLeafOverflow->NewRoot\n");
+  index.readRoot(7, 7, key, left, right);
+  fprintf(stderr, "Key: 7 rootPid: 7 Left: %d Right: %d\n", left, right);   // Left: 3 Right: 6
+  index.readRoot(5, 3, key, left, right);
+  fprintf(stderr, "Key: 5 rootPid: 3 Left: %d Right: %d\n", left, right);   // Left: 1 Right: 5
+  index.readRoot(8, 6, key, left, right);
+  fprintf(stderr, "Key: 8 rootPid: 6 Left: %d Right: %d\n", left, right);   // Left: 4 Right: 2
+
+  rid.pid = 0;
+  rid.sid = 5;
+  index.insert(12, rid);
+
+  rid.pid = 0;
+  rid.sid = 6;
+  index.insert(9, rid);
+
+  fprintf(stderr, "LeafOverflow\n");
+  index.readRoot(7, 7, key, left, right);
+  fprintf(stderr, "Key: 7 rootPid: 7 Left: %d Right: %d\n", left, right);   // Left: 3 Right: 6
+  index.readRoot(5, 3, key, left, right);
+  fprintf(stderr, "Key: 5 rootPid: 3 Left: %d Right: %d\n", left, right);   // Left: 1 Right: 5
+  index.readRoot(8, 6, key, left, right);
+  fprintf(stderr, "Key: 8 rootPid: 6 Left: %d Right: %d\n", left, right);   // Left: 4 Right: 2
+  index.readRoot(12, 6, key, left, right);
+  fprintf(stderr, "Key: 12 rootPid: 6 Left: %d Right: %d\n", left, right);   // Left: 2 Right: 8
+
+  rid.pid = 0;
+  rid.sid = 7;
+  index.insert(6, rid);
+
+  int count = 0;
+  cursor.pid = 1;
+  cursor.eid = 0;
+
+  while(!index.readForward(cursor, key, rid))
   {
-    fprintf(stderr, "Pid: %d Sid: %d ", rid.pid, rid.sid);
-    rf.read(rid, key, value);
-    fprintf(stderr, "Key: %d Value: %d\n", key, value);
+    fprintf(stderr, "Key: %d\n", key);
+    fprintf(stderr, "UpdatedCursor Pid: %d Eid: %d\n", cursor.pid, cursor.eid);
     count++;
   }
-  fprintf(stderr, "Count: %d\n", count);
+  fprintf(stderr, "Total Keys: %d\n", count);
+
+  index.close();
 
 }
-*/
 
 int main()
 {
@@ -336,90 +392,8 @@ int main()
 
   //testNonLeafNode();
 
-  //testReadForward(); 
-  
-  RecordFile rf;
-  BTreeIndex index; 
-  IndexCursor cursor;
-  RecordId rid;
-  int key;
-
- // rf.open("xsmall.tbl", 'r');
-  index.open("test.idx", 'w');
-  
-  
-  rid.pid = 0;
-  rid.sid = 0;
-  index.insert(1, rid);
-  
-  rid.pid = 0;
-  rid.sid = 1;
-  index.insert(4, rid);
-
-  rid.pid = 0;
-  rid.sid = 2;
-  index.insert(9, rid);
-  //index.close();
-
-  
-  rid.pid = 0;
-  rid.sid = 3;
-  index.insert(16, rid);
-  //index.close();
-  
-  
-  rid.pid = 0;
-  rid.sid = 4;
-  index.insert(25, rid);
-  
-  
-
-
-  /*
-  index.locate(8, cursor);
-  index.locate(5, cursor);
-  index.locate(1, cursor);
-  //fprintf(stderr, "\n");
-  */
-
-   
-  PageId left;
-  PageId right;
-  index.readRoot(9, 3, key, left, right);
-  fprintf(stderr, "Left: %d Right: %d\n", left, right);
-
-/*
-  index.readRoot(7, 3, key, left, right);
-  fprintf(stderr, "Left: %d Right: %d\n", left, right);
-  index.readRoot(8, 3, key, left, right);
-  fprintf(stderr, "Left: %d Right: %d\n", left, right);
-*/
-
-
-  //index.readRoot(7, 7, key, left, right);
-  //fprintf(stderr, "Left: %d Right: %d\n", left, right);
-  //index.readRoot(5, 3, key, left, right);
-  //fprintf(stderr, "Left: %d Right: %d\n", left, right);
-  //index.readRoot(8, 6, key, left, right);
-  //fprintf(stderr, "Left: %d Right: %d\n", left, right);
-
-  int count = 0;
-  cursor.pid = 1;
-  cursor.eid = 0;
-
-  while(!index.readForward(cursor, key, rid))
-  {
-    //fprintf(stderr, "Key: %d\n", key);
-    fprintf(stderr, "UpdatedCursor Pid: %d Eid: %d\n", cursor.pid, cursor.eid);
-    count++;
-  }
-  fprintf(stderr, "Total Keys: %d\n", count);
-  
-
-  index.close(); 
-  
-  
-  
+  testIndex(); 
+     
   fprintf(stderr, "All tests passed!\n");
   return 0;
 }
