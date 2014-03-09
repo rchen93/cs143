@@ -72,7 +72,10 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
         case SelCond::EQ:
           index.readForward(cursor, startval, rid);
           if (atoi(cond[i].value) == startval)
+          {
+            startkey = startval; 
             endkey = startkey + 1;
+          }
           else return 0;  
           break; 
 
