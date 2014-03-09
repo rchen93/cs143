@@ -59,6 +59,8 @@ RC BTreeIndex::open(const string& indexname, char mode)
 		int *intBuffer = (int*) buffer;
 		rootPid = intBuffer[0];
 		treeHeight = intBuffer[1];
+		smallestKey = intBuffer[2];
+		largestKey = intBuffer[3]; 
 
 		//fprintf(stderr, "Existing: RootPid: %d Height: %d\n", rootPid, treeHeight);
 	}
@@ -76,6 +78,8 @@ RC BTreeIndex::close()
 	int *intBuffer = (int*) buffer;
 	intBuffer[0] = rootPid;
 	intBuffer[1] = treeHeight;
+	intBuffer[2] = smallestKey; 
+	intBuffer[3] = largestKey; 
 
 	//fprintf(stderr, "What is this: %d %d %d %d %d\n", intBuffer[0], intBuffer[1], intBuffer[2], intBuffer[3], intBuffer[4]);
 
@@ -126,6 +130,8 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
     if (treeHeight == 0)
     {
     	//fprintf(stderr, "entering initTree at %d\n", treeHeight);
+    	smallestKey = key; 
+    	largestKey = key; 
     	return initTree(key, rid);
     }
 
@@ -166,6 +172,12 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
 RC BTreeIndex::insertHelper(int key, const RecordId& rid, int level, PageId pid, int& siblingKey, PageId& siblingPid)
 {
 	siblingKey = -1;
+
+	if (key < smallestKey)
+    	smallestKey = key; 
+    else if (key > largestKey)
+    	largestKey = key; 
+
 
 	// Base Case: at leaf node
 	if (level == treeHeight)
@@ -324,6 +336,7 @@ RC BTreeIndex::locate(int searchKey, IndexCursor& cursor)
 	// read the leaf
 	leaf->read(cursor.pid, pf);
 
+
 	RC rc = leaf->locate(searchKey, cursor.eid);
 
 	if (rc != 0)
@@ -417,4 +430,16 @@ RC BTreeIndex::readForward(IndexCursor& cursor, int& key, RecordId& rid)
    //fprintf(stderr, "Updated Eid; %d\n", cursor.eid);
    delete leaf;
    return 0;
+}
+
+RC BTreeIndex::getSmallestKey(int& searchKey)
+{
+	searchKey = smallestKey; 
+	return 0;
+}
+
+RC BTreeIndex::getLargestKey(int& searchKey)
+{
+	searchKey = largestKey;
+	return 0; 
 }

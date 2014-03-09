@@ -7,4 +7,3 @@ rm -f large.tbl large.idx
 rm -f xlarge.tbl xlarge.idx
 
 ./bruinbase < test.sql
-

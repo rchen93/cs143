@@ -386,14 +386,32 @@ void testIndex()
 int main()
 {
   // run the SQL engine taking user commands from standard input (console).
-  //SqlEngine::run(stdin);
+  SqlEngine::run(stdin);
 
   //testLeafNode();
 
   //testNonLeafNode();
 
-  testIndex(); 
-     
+  //testIndex(); 
+  /*
+  BTreeIndex index;
+  IndexCursor cursor;
+  int key;
+  RecordId rid;
+
+  index.open("xsmall.idx", 'w');
+
+  index.locate(0, cursor);
+
+  while(!index.readForward(cursor, key, rid))
+  {
+    fprintf(stderr, "Key: %d\n", key);
+    fprintf(stderr, "UpdatedCursor Pid: %d Eid: %d\n", cursor.pid, cursor.eid);
+  }
+
+  index.close();
+
+  */
   fprintf(stderr, "All tests passed!\n");
   return 0;
 }

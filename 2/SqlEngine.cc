@@ -41,9 +41,135 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
   RC     rc;
   int    key;     
   string value;
-  int    count;
+  int    count = 0;
   int    diff;
 
+  BTreeIndex index; 
+  IndexCursor cursor; 
+
+/*--------- NEED TO DO NOT EQUALS --------*/
+
+  // check if index exists for table
+  // it exists, use index instead of table
+  if (rc = index.open(table + ".idx", 'r') == 0)
+  {
+    // how to initialize?
+    int smallestKey; 
+    int largestKey; 
+
+    //index.getSmallestKey(smallestKey); 
+    //index.getSmallestKey(largestKey); 
+    //fprintf(stdout, "small: %d\n", smallestKey);
+    //fprintf(stdout, "large: %d\n", largestKey);
+
+    int startkey = 0;
+    int endkey = 2147483647;
+    int startval; 
+    int endval;  
+
+    for (int i = 0; i < cond.size(); i++)
+    {
+      // locate in index where attr is stored
+      index.locate(atoi(cond[i].value), cursor);
+
+      switch(cond[i].comp) {
+        case SelCond::EQ:
+          index.readForward(cursor, startval, rid);
+          if (atoi(cond[i].value) == startval)
+            endkey = startkey + 1;
+          else return 0;  
+          break; 
+
+        case SelCond::LT: 
+          index.readForward(cursor, endval, rid);
+          if (atoi(cond[i].value) < endkey)
+            endkey = atoi(cond[i].value) - 1; 
+          break; 
+
+        case SelCond::LE: 
+          index.readForward(cursor, endval, rid);
+          if (atoi(cond[i].value) < endkey)
+            endkey = atoi(cond[i].value); 
+          break; 
+
+        case SelCond::GT:
+          index.readForward(cursor, startval, rid);
+          if (atoi(cond[i].value) > startkey)
+          {
+            startkey = atoi(cond[i].value) + 1; 
+            //fprintf(stdout, "HIII\n");
+          }
+          //fprintf(stdout, "StartKey: %d\n", startkey);
+          break; 
+
+        case SelCond::GE: 
+          index.readForward(cursor, startval, rid);
+          if (atoi(cond[i].value) > startkey)
+            startkey = atoi(cond[i].value); 
+          break; 
+
+      }
+
+    }
+
+    //fprintf(stdout, "start: %d\n", startkey);
+   // fprintf(stdout, "end: %d\n", endkey);
+
+    index.locate(startkey, cursor);
+
+    /*
+    if (cond.size() == 1)
+    {
+      index.readForward(cursor, key, rid);
+      rc = rf.read(rid, key, value); 
+      count++; 
+      if (attr != 4)
+      {
+        switch (attr) {
+        case 1:  // SELECT key
+          fprintf(stdout, "%d\n", key);
+          break;
+        case 2:  // SELECT value
+          fprintf(stdout, "%s\n", value.c_str());
+          break;
+        case 3:  // SELECT *
+          fprintf(stdout, "%d '%s'\n", key, value.c_str());
+          break;
+            }
+      }
+    }
+    */
+
+      while (!index.readForward(cursor, key, rid) && key < endkey)
+      {
+        rc = rf.read(rid, key, value); 
+        count++; 
+
+        if(attr != 4)
+        {
+          switch (attr) {
+          case 1:  // SELECT key
+            fprintf(stdout, "%d\n", key);
+            break;
+          case 2:  // SELECT value
+            fprintf(stdout, "%s\n", value.c_str());
+            break;
+          case 3:  // SELECT *
+            fprintf(stdout, "%d '%s'\n", key, value.c_str());
+            break;
+              }
+        }
+      }
+    
+
+    if (attr == 4)
+      fprintf(stdout, "%d\n", count);
+
+    rf.close();
+    return rc; 
+  }
+
+  // else use table 
   // open the table file
   if ((rc = rf.open(table + ".tbl", 'r')) < 0) {
     fprintf(stderr, "Error: table %s does not exist\n", table.c_str());
@@ -65,33 +191,33 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
       // compute the difference between the tuple value and the condition value
       switch (cond[i].attr) {
       case 1:
-	diff = key - atoi(cond[i].value);
-	break;
+      	diff = key - atoi(cond[i].value);
+      	break;
       case 2:
-	diff = strcmp(value.c_str(), cond[i].value);
-	break;
+      	diff = strcmp(value.c_str(), cond[i].value);
+      	break;
       }
 
       // skip the tuple if any condition is not met
       switch (cond[i].comp) {
       case SelCond::EQ:
-	if (diff != 0) goto next_tuple;
-	break;
+      	if (diff != 0) goto next_tuple;
+      	break;
       case SelCond::NE:
-	if (diff == 0) goto next_tuple;
-	break;
+      	if (diff == 0) goto next_tuple;
+      	break;
       case SelCond::GT:
-	if (diff <= 0) goto next_tuple;
-	break;
+      	if (diff <= 0) goto next_tuple;
+      	break;
       case SelCond::LT:
-	if (diff >= 0) goto next_tuple;
-	break;
+      	if (diff >= 0) goto next_tuple;
+      	break;
       case SelCond::GE:
-	if (diff < 0) goto next_tuple;
-	break;
+      	if (diff < 0) goto next_tuple;
+      	break;
       case SelCond::LE:
-	if (diff > 0) goto next_tuple;
-	break;
+      	if (diff > 0) goto next_tuple;
+      	break;
       }
     }
 
