@@ -34,7 +34,6 @@ PageFile::PageFile(const string& filename, char mode)
 
 RC PageFile::open(const string& filename, char mode)
 {
-  fprintf(stderr, "opening in PageFile\n");
   RC   rc;
   int  oflag;
   struct stat statbuf;

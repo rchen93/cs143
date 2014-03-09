@@ -412,6 +412,5 @@ int main()
   index.close();
 
   */
-  fprintf(stderr, "All tests passed!\n");
   return 0;
 }

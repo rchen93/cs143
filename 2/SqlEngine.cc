@@ -47,21 +47,17 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
   BTreeIndex index; 
   IndexCursor cursor; 
 
+  if ((rc = rf.open(table + ".tbl", 'r')) < 0) {
+    fprintf(stderr, "Error: table %s does not exist\n", table.c_str());
+  return rc;
+  }
+
 /*--------- NEED TO DO NOT EQUALS --------*/
 
   // check if index exists for table
   // it exists, use index instead of table
   if (rc = index.open(table + ".idx", 'r') == 0)
   {
-    // how to initialize?
-    int smallestKey; 
-    int largestKey; 
-
-    //index.getSmallestKey(smallestKey); 
-    //index.getSmallestKey(largestKey); 
-    //fprintf(stdout, "small: %d\n", smallestKey);
-    //fprintf(stdout, "large: %d\n", largestKey);
-
     int startkey = 0;
     int endkey = 2147483647;
     int startval; 
@@ -112,18 +108,14 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
 
     }
 
-    //fprintf(stdout, "start: %d\n", startkey);
-   // fprintf(stdout, "end: %d\n", endkey);
-
     index.locate(startkey, cursor);
 
-    /*
-    if (cond.size() == 1)
+    while (!index.readForward(cursor, key, rid) && key < endkey)
     {
-      index.readForward(cursor, key, rid);
       rc = rf.read(rid, key, value); 
       count++; 
-      if (attr != 4)
+
+      if(attr != 4)
       {
         switch (attr) {
         case 1:  // SELECT key
@@ -138,29 +130,7 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
             }
       }
     }
-    */
-
-      while (!index.readForward(cursor, key, rid) && key < endkey)
-      {
-        rc = rf.read(rid, key, value); 
-        count++; 
-
-        if(attr != 4)
-        {
-          switch (attr) {
-          case 1:  // SELECT key
-            fprintf(stdout, "%d\n", key);
-            break;
-          case 2:  // SELECT value
-            fprintf(stdout, "%s\n", value.c_str());
-            break;
-          case 3:  // SELECT *
-            fprintf(stdout, "%d '%s'\n", key, value.c_str());
-            break;
-              }
-        }
-      }
-    
+  
 
     if (attr == 4)
       fprintf(stdout, "%d\n", count);
@@ -170,11 +140,6 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
   }
 
   // else use table 
-  // open the table file
-  if ((rc = rf.open(table + ".tbl", 'r')) < 0) {
-    fprintf(stderr, "Error: table %s does not exist\n", table.c_str());
-    return rc;
-  }
 
   // scan the table file from the beginning
   rid.pid = rid.sid = 0;
@@ -304,8 +269,6 @@ RC SqlEngine::load(const string& table, const string& loadfile, bool index)
         }
       }
   }
-  
-  fprintf(stderr, "Successful!\n"); // Remove later n 1;
     
   rf.close();
   lf.close();
