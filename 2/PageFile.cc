@@ -100,7 +100,6 @@ RC PageFile::seek(PageId pid) const
 
 RC PageFile::write(PageId pid, const void* buffer)
 {
-  //fprintf(stderr, "written pid: %d\n", pid);
   RC rc;
   if (pid < 0) return RC_INVALID_PID; 
 
@@ -112,7 +111,6 @@ RC PageFile::write(PageId pid, const void* buffer)
 
   // if the page is in read cache, invalidate it
   for (int i = 0; i < CACHE_COUNT; i++) {
-    //fprintf(stderr, "here\n");
     if (readCache[i].fd == fd && readCache[i].pid == pid &&
         readCache[i].lastAccessed != 0) {
        readCache[i].fd = 0;

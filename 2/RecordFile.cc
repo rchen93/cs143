@@ -180,8 +180,6 @@ RC RecordFile::read(const RecordId& rid, int& key, string& value) const
   // read the record from the slot in the page
   readSlot(page, rid.sid, key, value);
 
-  //fprintf(stdout, "Value: %s\n", value.c_str());
-
   return 0;
 }
 

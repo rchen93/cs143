@@ -47,9 +47,13 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
   BTreeIndex index; 
   IndexCursor cursor; 
 
-  if ((rc = rf.open(table + ".tbl", 'r')) < 0) {
-    fprintf(stderr, "Error: table %s does not exist\n", table.c_str());
-  return rc;
+  if (cond.size() == 0 && attr == 4)
+    ;
+  else {
+    if ((rc = rf.open(table + ".tbl", 'r')) < 0) {
+      fprintf(stderr, "Error: table %s does not exist\n", table.c_str());
+    return rc;
+    }
   }
 
 /*--------- NEED TO DO NOT EQUALS --------*/
@@ -111,7 +115,7 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
 
     }
 
-    index.locate(startkey, cursor);
+    index.locate(startkey, cursor);  
 
     while (!index.readForward(cursor, key, rid) && key < endkey)
     {
@@ -142,8 +146,7 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
     return rc; 
   }
 
-  // else use table 
-
+  // else use table
   // scan the table file from the beginning
   rid.pid = rid.sid = 0;
   count = 0;
