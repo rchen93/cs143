@@ -4,6 +4,7 @@ SELECT COUNT(*) FROM xsmall
   TA comment#A: 3 pages is okay. Note that you can get 2 if 
               you make sure that (when split) the pid of 
               root node is always at index = 0.
+Our Performance: 2 page reads
   
 SELECT * FROM xsmall WHERE key < 2500
 272 'Baby Take a Bow'
@@ -12,6 +13,7 @@ SELECT * FROM xsmall WHERE key < 2500
 2342 'Last Ride, The'
   -- 0.000 seconds to run the select command. Read 2 pages
   TA comment: 3 is okay, see the first comment #A
+Our Performance: 3 page reads
 
 SELECT COUNT(*) FROM small
 50
@@ -20,6 +22,7 @@ SELECT COUNT(*) FROM small
   you don't need to read "value" column because 
   no duplicate is allowed in this project.
   Namely, count(*) == count(key)
+Our Performance: 2 page reads
 
 SELECT * FROM small WHERE key > 100 AND key < 500
 173 'Angel Levine, The'
@@ -30,21 +33,26 @@ SELECT * FROM small WHERE key > 100 AND key < 500
 489 'Blue Hawaii'
   -- 0.000 seconds to run the select command. Read 6 pages
   TA comment: 7 is okay, see first comment #A
+Our Performance: 7 page reads
 
 SELECT COUNT(*) FROM medium
 100
   -- 0.000 seconds to run the select command. Read 4 pages
   TA comment: check comment #A and #B
+Our Performance: 4 page reads
 
 SELECT * FROM medium WHERE key = 489
 489 'Blue Hawaii'
   -- 0.000 seconds to run the select command. Read 4 pages
   TA comment: 5 is okay, seed comment #A
+Our Performance: 5 page reads
+
 
 SELECT COUNT(*) FROM large
 1000
   -- 0.000 seconds to run the select command. Read 21 pages
   TA comment: 22 is okay, see comment #A
+Our Performance: 18 page reads
 
 SELECT * FROM large WHERE key > 4500
 4506 'Waterworld'
@@ -78,6 +86,7 @@ SELECT * FROM large WHERE key > 4500
 4733 'la folie'
   -- 0.000 seconds to run the select command. Read 15 pages
   TA Comment: 16 is okay, see comment#A
+Our Performance: 16 page reads
 
 SELECT * FROM large WHERE key > 4500 AND key > 0
 4506 'Waterworld'
@@ -111,16 +120,19 @@ SELECT * FROM large WHERE key > 4500 AND key > 0
 4733 'la folie'
   -- 0.000 seconds to run the select command. Read 15 pages
   TA comment: 16 is okay, see comment #A
+Our Performance: 16 page reads  
 
 SELECT COUNT(*) FROM xlarge
 12278
   -- 0.000 seconds to run the select command. Read 219 pages
   TA comment: see comment #A , #B
+Our Performance: 221 page reads
 
 SELECT * FROM xlarge WHERE key = 4240
 4240 'Tommy Boy'
   -- 0.000 seconds to run the select command. Read 5 pages
-  TA Comment: 5 is okay, see comment #A
+  TA Comment: 6 is okay, see comment #A
+Our Performance: 6 page reads
 
 SELECT * FROM xlarge WHERE key > 400 AND key < 500 AND key > 100 AND key < 4000000
 402 'Big Squeeze, The'
@@ -189,4 +201,8 @@ SELECT * FROM xlarge WHERE key > 400 AND key < 500 AND key > 100 AND key < 40000
 496 'Bobby G. Cant Swim'
   -- 0.000 seconds to run the select command. Read 69 pages
   TA comment: minor differnce such as 69~73 are okay, see comment #A
+Our Performance: 69 page reads
 
+SELECT * FROM Movie WHERE key > 0
+  -- Read < 500 pages
+Our Performance: 465 page reads

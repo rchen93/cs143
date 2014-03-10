@@ -13,6 +13,8 @@
 #include "Bruinbase.h"
 #include "SqlEngine.h"
 #include "BTreeIndex.h"
+#include <set>
+
 
 using namespace std;
 
@@ -67,49 +69,60 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
     int startval; 
     int endval;  
 
-    for (int i = 0; i < cond.size(); i++)
+    set<RecordId> records;    // stores the recordId's we need to read
+
+    for (unsigned i = 0; i < cond.size(); i++)
     {
       // locate in index where attr is stored
-      index.locate(atoi(cond[i].value), cursor);
+      //index.locate(atoi(cond[i].value), cursor);
 
       switch(cond[i].comp) {
         case SelCond::EQ:
+          // value equality
           if (attr == 2) {
             
           }
           else {
+            index.locate(atoi(cond[i].value), cursor);
             index.readForward(cursor, startval, rid);
+
+            // if the key stored at the corresponding is the same as the one we're looking for 
             if (atoi(cond[i].value) == startval)
             {
               startkey = startval; 
               endkey = startkey + 1;
             }
+
             else return 0;  
           }
           break; 
 
         case SelCond::LT: 
-          index.readForward(cursor, endval, rid);
-          if (atoi(cond[i].value) < endkey)
+          //index.readForward(cursor, endval, rid);
+
+          if (atoi(cond[i].value) <= endkey)
             endkey = atoi(cond[i].value) - 1; 
           break; 
 
         case SelCond::LE: 
-          index.readForward(cursor, endval, rid);
+          //index.readForward(cursor, endval, rid);
+
           if (atoi(cond[i].value) < endkey)
             endkey = atoi(cond[i].value); 
           break; 
 
         case SelCond::GT:
-          index.readForward(cursor, startval, rid);
-          if (atoi(cond[i].value) > startkey)
+          //index.readForward(cursor, startval, rid);
+
+          if (atoi(cond[i].value) >= startkey)
           {
             startkey = atoi(cond[i].value) + 1; 
           }
           break; 
 
         case SelCond::GE: 
-          index.readForward(cursor, startval, rid);
+          //index.readForward(cursor, startval, rid);
+
           if (atoi(cond[i].value) > startkey)
             startkey = atoi(cond[i].value); 
           break; 
@@ -120,9 +133,17 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
 
     index.locate(startkey, cursor);  
 
+    // insert the records we need to read into the set
     while (!index.readForward(cursor, key, rid) && key < endkey)
     {
-      rc = rf.read(rid, key, value); 
+      records.insert(rid);
+    }
+
+    set<RecordId>::iterator iter;
+
+    for (iter = records.begin(); iter != records.end(); iter++)
+    {
+      rc = rf.read(*iter, key, value); 
       count++; 
 
       if(attr != 4)
@@ -141,7 +162,6 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
       }
     }
   
-
     if (attr == 4)
       fprintf(stdout, "%d\n", count);
 
