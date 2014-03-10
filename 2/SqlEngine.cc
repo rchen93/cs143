@@ -74,13 +74,18 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
 
       switch(cond[i].comp) {
         case SelCond::EQ:
-          index.readForward(cursor, startval, rid);
-          if (atoi(cond[i].value) == startval)
-          {
-            startkey = startval; 
-            endkey = startkey + 1;
+          if (attr == 2) {
+            
           }
-          else return 0;  
+          else {
+            index.readForward(cursor, startval, rid);
+            if (atoi(cond[i].value) == startval)
+            {
+              startkey = startval; 
+              endkey = startkey + 1;
+            }
+            else return 0;  
+          }
           break; 
 
         case SelCond::LT: 
@@ -100,9 +105,7 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
           if (atoi(cond[i].value) > startkey)
           {
             startkey = atoi(cond[i].value) + 1; 
-            //fprintf(stdout, "HIII\n");
           }
-          //fprintf(stdout, "StartKey: %d\n", startkey);
           break; 
 
         case SelCond::GE: 
