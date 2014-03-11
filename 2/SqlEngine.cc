@@ -71,6 +71,8 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
     char* eqvalue = NULL; 
      
     set<RecordId> records;    // stores the recordId's we need to read
+    set<string> nevalue;       // stores the char* of values for NE
+    set<int> nekey;           // stores the ints of keys for NE
 
     for (unsigned i = 0; i < cond.size(); i++)
     {
@@ -105,21 +107,18 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
 
         case SelCond::LT: 
           //index.readForward(cursor, endval, rid);
-
           if (atoi(cond[i].value) <= endkey)
             endkey = atoi(cond[i].value) - 1; 
           break; 
 
         case SelCond::LE: 
           //index.readForward(cursor, endval, rid);
-
           if (atoi(cond[i].value) < endkey)
             endkey = atoi(cond[i].value); 
           break; 
 
         case SelCond::GT:
           //index.readForward(cursor, startval, rid);
-
           if (atoi(cond[i].value) >= startkey)
           {
             startkey = atoi(cond[i].value) + 1; 
@@ -128,9 +127,15 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
 
         case SelCond::GE: 
           //index.readForward(cursor, startval, rid);
-
           if (atoi(cond[i].value) > startkey)
             startkey = atoi(cond[i].value); 
+          break; 
+
+        case SelCond::NE:
+          if (cond[i].attr == 2)
+            nevalue.insert(cond[i].value);
+          else 
+            nekey.insert(atoi(cond[i].value)); 
           break; 
 
       }
@@ -151,33 +156,41 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
     {
       rc = rf.read(*iter, key, value); 
 
-      // if there is a val attribute
-      if (eqvalue != NULL)
-      {
-        if (value == eqvalue)
-        {
-          count++;
+      set<int>::iterator keyiter; 
+      set<string>::iterator valiter; 
 
-          switch (attr) {
-          case 1:  // SELECT key
-            fprintf(stdout, "%d\n", key);
-            break;
-          case 2:  // SELECT value
-            fprintf(stdout, "%s\n", value.c_str());
-            break;
-          case 3:  // SELECT *
-            fprintf(stdout, "%d '%s'\n", key, value.c_str());
-            break;
-          }
+      if (!nekey.empty() || !nevalue.empty())
+      {
+        if(!nekey.empty())
+        {
+          keyiter = nekey.find(key); 
+          if (keyiter != nekey.end())
+            continue; 
         }
+
+        if(!nevalue.empty())
+        {
+          valiter = nevalue.find(value); 
+          if (valiter != nevalue.end())
+            continue; 
+        }
+
       }
 
-      // there is no val attribute
-      else if(attr != 4) {
-        count++; 
+      // if the attr is val
+      if (eqvalue != NULL)
+      {
+        // do not print if value != attr val
+        if (value != eqvalue)
+          continue; 
+      }
 
+      count++;
+      
+      if (attr != 4) {
         switch (attr) {
         case 1:  // SELECT key
+          // if key is in NE set, don't print 
           fprintf(stdout, "%d\n", key);
           break;
         case 2:  // SELECT value
@@ -186,9 +199,9 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
         case 3:  // SELECT *
           fprintf(stdout, "%d '%s'\n", key, value.c_str());
           break;
-            }      
-      }
-    }
+        }  
+      }       
+  }
 
     if (attr == 4)
       fprintf(stdout, "%d\n", count);
