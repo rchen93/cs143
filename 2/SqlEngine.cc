@@ -22,7 +22,6 @@ using namespace std;
 extern FILE* sqlin;
 int sqlparse(void);
 
-
 RC SqlEngine::run(FILE* commandline)
 {
   fprintf(stdout, "Bruinbase> ");
@@ -148,6 +147,10 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
     while (!index.readForward(cursor, key, rid) && key < endkey)
     {
       records.insert(rid);
+      //fprintf(stdout, "Key: %d\n", key);
+      //fprintf(stdout, "Pid: %d\n", rid.pid);
+      //fprintf(stdout, "Sid: %d\n", rid.sid);
+      count++;
     }
 
     set<RecordId>::iterator iter;
@@ -184,8 +187,6 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
         if (value != eqvalue)
           continue; 
       }
-
-      count++;
       
       if (attr != 4) {
         switch (attr) {
@@ -330,6 +331,9 @@ RC SqlEngine::load(const string& table, const string& loadfile, bool index)
 
       parseLoadLine(line, key, value);
       rf.append(key, value, rid);
+      //fprintf(stdout, "Key: %d\n", key);
+      //fprintf(stdout, "Pid: %d\n", rid.pid);
+      //fprintf(stdout, "Sid: %d\n", rid.sid);
       if (index == true)
       {
         if (idx.insert(key, rid) != 0)

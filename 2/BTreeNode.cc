@@ -195,8 +195,8 @@ RC BTLeafNode::insertAndSplit(int key, const RecordId& rid,
 		if (read_key < key)
 		{
 			intBuffer[3*(i+1)+1] = key;
-			intBuffer[3*(i+1)+2] = read_rid.pid;
-			intBuffer[3*(i+1)+3] = read_rid.sid;
+			intBuffer[3*(i+1)+2] = rid.pid;
+			intBuffer[3*(i+1)+3] = rid.sid;
 			intBuffer[3*i+1] = read_key;
 			intBuffer[3*i+2] = read_rid.pid;
 			intBuffer[3*i+3] = read_rid.sid;
