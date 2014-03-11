@@ -68,7 +68,8 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
     int endkey = 2147483647;
     int startval; 
     int endval;  
-
+    char* eqvalue = NULL; 
+     
     set<RecordId> records;    // stores the recordId's we need to read
 
     for (unsigned i = 0; i < cond.size(); i++)
@@ -79,8 +80,14 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
       switch(cond[i].comp) {
         case SelCond::EQ:
           // value equality
-          if (attr == 2) {
-            
+          if (cond[i].attr == 2) {
+            // can not have more than 1 EQ val attribute
+            if(eqvalue != NULL)
+            {
+              rf.close();
+              return rc; 
+            }
+            else eqvalue = cond[i].value; 
           }
           else {
             index.locate(atoi(cond[i].value), cursor);
@@ -92,7 +99,6 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
               startkey = startval; 
               endkey = startkey + 1;
             }
-
             else return 0;  
           }
           break; 
@@ -144,10 +150,32 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
     for (iter = records.begin(); iter != records.end(); iter++)
     {
       rc = rf.read(*iter, key, value); 
-      count++; 
 
-      if(attr != 4)
+      // if there is a val attribute
+      if (eqvalue != NULL)
       {
+        if (value == eqvalue)
+        {
+          count++;
+
+          switch (attr) {
+          case 1:  // SELECT key
+            fprintf(stdout, "%d\n", key);
+            break;
+          case 2:  // SELECT value
+            fprintf(stdout, "%s\n", value.c_str());
+            break;
+          case 3:  // SELECT *
+            fprintf(stdout, "%d '%s'\n", key, value.c_str());
+            break;
+          }
+        }
+      }
+
+      // there is no val attribute
+      else if(attr != 4) {
+        count++; 
+
         switch (attr) {
         case 1:  // SELECT key
           fprintf(stdout, "%d\n", key);
@@ -158,10 +186,10 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
         case 3:  // SELECT *
           fprintf(stdout, "%d '%s'\n", key, value.c_str());
           break;
-            }
+            }      
       }
     }
-  
+
     if (attr == 4)
       fprintf(stdout, "%d\n", count);
 
