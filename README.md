@@ -6,8 +6,8 @@ The README.txt contained in each project was for submission purposes.
 The following projects will have their minimum requirements listed, and all links used
 are relative URLs.
 
-<h3> Project 1A: PHP Web Calculator </h3>
-<hr>
+### Project 1A: PHP Web Calculator 
+----------------------------------------
 
 We built a small Web calculator application in PHP to become familiarized with HTML and PHP.
 We used HTTP GET requests to get the user input.
@@ -19,8 +19,8 @@ Requirements:
 <li> Handle errors gracefully, i.e., do not display raw PHP error messages </li>
 </ul>
 
-<h3> Project 1B: Web Query Interface </h3>
-<hr>
+### Project 1B: Web Query Interface 
+----------------------------------------
 
 We built a web query interface that allowed users to enter MySQL queries for our MySQL database.
 We were allowed to assume that users would not attempt SQL injection attacks; thus, we did not use
@@ -29,6 +29,7 @@ get the user input.
 <br/>
 This was also our first usage of MySQL, as we created nine tables and loaded the given datasets
 into them. 
+<br/>
 Requirements: 
 <ul>
 <li> Three primary key constraints </li>
@@ -36,13 +37,14 @@ Requirements:
 <li> Three CHECK constraints </li>
 </ul>
 
-<h3> Project 1C: Hobo IMDB </h3>
-<hr>
+### Project 1C: Hobo IMDB 
+----------------------------------------
 
 We built a basic movie database site that used the tables and data created in Part B.
 The project was very open-ended in terms of how we wanted to structure the required 
 functionalities. We used basic HTML/CSS techniques to create a minimalistic website, 
 screenshots are provided.
+<br/>
 Requirements: 
 <ul>
 <li> A page that lets users to add actor and/or director information </li>
@@ -66,12 +68,15 @@ Requirements:
 </ul>
 
 
-<h3> Project 2: Bruinbase </h3>
-<hr>
+### Project 2: Bruinbase 
+----------------------------------------
 
+We implemented a B+ tree index for a very simplified relational database
+and only needed to support insertion of keys. 
+We also implemented LOAD and SELECT commands for our database. 
 
-<h3> Authors </h3>
-<hr>
+### Authors 
+----------------------------------------
 
 Kailin Chang <br/>
 Roger Chen
